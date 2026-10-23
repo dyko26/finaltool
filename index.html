@@ -2,40 +2,40 @@
 <html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta tag crítico para evitar zoom no deseado en celulares -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0f172a">
     <title>OPI•VRI Pro Suite</title>
-    <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'], } } }
-        }
+        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'], } } } }
         if (localStorage.theme === 'light') document.documentElement.classList.remove('dark');
         else document.documentElement.classList.add('dark');
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(e=>console.log(e));
+        
+        // DESTRUCTOR DE CACHÉ VIEJO: Elimina Service Workers atascados
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) { registration.unregister(); }
+            });
+        }
     </script>
     <style>
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #64748b; border-radius: 10px; }
-        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
         
-        /* Botones Scratchpad */
-        .chip-data { padding: 5px 10px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; color: #1e293b; cursor: pointer; white-space: nowrap; }
+        .chip-data { padding: 5px 10px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; color: #1e293b; cursor: pointer; white-space: nowrap; transition: 0.1s; }
         .dark .chip-data { background: #1e293b; border-color: #334155; color: #e2e8f0; }
         .chip-data:active { transform: scale(0.95); }
         
-        .chip-sym { padding: 5px 10px; font-size: 12px; font-weight: 800; font-family: 'JetBrains Mono', monospace; border-radius: 8px; border: 1px solid #c7d2fe; background: #eef2ff; color: #4338ca; cursor: pointer; white-space: nowrap; }
+        .chip-sym { padding: 5px 10px; font-size: 12px; font-weight: 800; font-family: 'JetBrains Mono', monospace; border-radius: 8px; border: 1px solid #c7d2fe; background: #eef2ff; color: #4338ca; cursor: pointer; white-space: nowrap; transition: 0.1s; }
         .dark .chip-sym { background: rgba(49,46,129,0.45); border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
         .chip-sym:active { transform: scale(0.95); }
 
-        mark.hl { background: rgba(250,204,21,0.35); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: 800; }
+        mark.hl { background: rgba(250,204,21,0.4); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: 800; }
         .dark mark.hl { background: rgba(234,179,8,0.4); color: #fef08a; }
 
         .perspective-1000 { perspective: 1000px; }
@@ -45,11 +45,9 @@
         .flashcard-inner { transition: transform 0.5s ease-out; }
         .flipped .flashcard-inner { transform: rotateY(180deg); }
         
-        /* Ajustes Mobile */
-        @media (max-width: 1023px) {
-            .mobile-tab-content { display: none; height: 100%; flex-direction: column; }
-            .mobile-tab-content.active { display: flex; }
-        }
+        /* Ocultar barra de desplazamiento en subtítulos pero permitir scroll */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans h-screen flex flex-col overflow-hidden transition-colors duration-200">
@@ -59,9 +57,9 @@
         <span id="toastMsg">Notificación</span>
     </div>
 
-    <!-- HEADER MULTIZONA (Solo Desktop) -->
-    <div class="hidden lg:flex bg-slate-900 dark:bg-black text-slate-300 text-[11px] py-1.5 px-4 font-mono justify-between items-center border-b border-slate-800 shrink-0">
-        <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="text-slate-400 font-sans font-bold uppercase">Multizona</span></div>
+    <!-- HEADER MULTIZONA -->
+    <div class="hidden md:flex bg-slate-900 dark:bg-black text-slate-300 text-[11px] py-1.5 px-4 font-mono justify-between items-center border-b border-slate-800 shrink-0">
+        <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span class="font-bold uppercase tracking-widest">Global Sync</span></div>
         <div class="flex gap-6">
             <div>🇨🇷 CR: <span id="time-cr" class="font-bold text-white"></span></div>
             <div>🇺🇸 PT: <span id="time-pt" class="font-bold text-emerald-400"></span></div>
@@ -69,100 +67,124 @@
             <div>🇺🇸 CT: <span id="time-ct" class="font-bold text-amber-400"></span></div>
             <div>🇺🇸 ET: <span id="time-et" class="font-bold text-rose-400"></span></div>
         </div>
-        <div class="flex gap-3 text-[10px] text-slate-400 font-sans">
-            <span><kbd class="px-1 bg-slate-800 rounded">Alt+S</kbd> Subs</span>
-            <span><kbd class="px-1 bg-slate-800 rounded">ESC</kbd> Limpiar</span>
+        <div class="flex gap-3 text-[10px] text-slate-400 font-sans font-bold">
+            <span><kbd class="px-1.5 py-0.5 bg-slate-800 rounded">Alt+S</kbd> Subs</span>
+            <span><kbd class="px-1.5 py-0.5 bg-slate-800 rounded">ESC</kbd> Limpiar</span>
         </div>
     </div>
 
-    <div class="flex-1 flex flex-col min-h-0 w-full max-w-[1600px] mx-auto p-2 lg:p-4 gap-3">
+    <!-- MAIN APP WRAPPER -->
+    <div class="flex-1 flex flex-col min-h-0 w-full max-w-[1700px] mx-auto p-2 md:p-3 gap-3">
         
-        <!-- MAIN NAVBAR -->
-        <header class="flex justify-between items-center bg-white dark:bg-slate-900 px-3 py-2.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 shrink-0">
-            <div class="flex items-center gap-2 lg:gap-4">
-                <div class="bg-blue-600 text-white px-2 lg:px-3 py-1.5 rounded-xl font-black text-sm lg:text-base shadow-md">OPI•VRI</div>
-                <div class="hidden lg:block">
-                    <h1 class="font-extrabold leading-none">Interpreter Pro Suite</h1>
-                    <select id="agencySelect" onchange="updateAgencyScripts()" class="text-[10px] bg-transparent font-bold text-blue-500 focus:outline-none mt-1">
-                        <option value="Konnect CX" class="dark:bg-slate-900">Konnect CX</option>
-                        <option value="MultilingualInt" class="dark:bg-slate-900">MultilingualInt</option>
-                        <option value="Nuvo CX" class="dark:bg-slate-900">Nuvo CX</option>
-                    </select>
+        <!-- NAVBAR -->
+        <header class="flex justify-between items-center bg-white dark:bg-slate-900 px-3 md:px-4 py-2.5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white px-3 py-1.5 rounded-xl font-black text-sm md:text-base shadow-md">OPI•VRI</div>
+                <div class="hidden sm:block">
+                    <h1 class="font-extrabold leading-none text-slate-800 dark:text-white">Interpreter Pro Suite</h1>
+                    <div class="flex gap-2 mt-1">
+                        <select id="agencySelect" onchange="updateAgencyScripts()" class="text-[10px] bg-slate-100 dark:bg-slate-800 font-bold text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded focus:outline-none">
+                            <option value="Konnect CX">Konnect CX</option>
+                            <option value="MultilingualInt">MultilingualInt</option>
+                            <option value="Nuvo CX">Nuvo CX</option>
+                        </select>
+                        <input type="text" id="interpreterIdInput" placeholder="ID Intérprete" oninput="saveInterpreterId()" class="text-[10px] bg-slate-100 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded w-20 focus:outline-none">
+                    </div>
                 </div>
             </div>
             
-            <div class="flex items-center gap-2 overflow-x-auto hide-scroll">
-                <!-- Herramientas Mobile & Desktop -->
-                <button onclick="toggleModal('toolsModal')" class="px-3 py-2 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded-xl border border-indigo-200 dark:border-indigo-800/50 whitespace-nowrap">🛠️ Tools</button>
-                <button onclick="toggleModal('codeRedModal')" class="px-3 py-2 bg-red-600 text-white font-bold text-xs rounded-xl shadow-md shadow-red-600/30 whitespace-nowrap animate-pulse hidden sm:block">🚨 CÓDIGO ROJO</button>
-                <button onclick="openAtlas()" class="px-3 py-2 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold text-xs rounded-xl border border-emerald-200 dark:border-emerald-800/50 whitespace-nowrap">🧍‍♂️ Atlas</button>
-                <button onclick="toggleModal('protocolModal')" class="px-3 py-2 bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold text-xs rounded-xl border border-purple-200 dark:border-purple-800/50 whitespace-nowrap hidden sm:block">📖 Scripts</button>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleModal('toolsModal')" class="px-3 py-2 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded-xl border border-indigo-200 dark:border-indigo-800/50">🛠️ Herramientas</button>
+                <button onclick="toggleModal('codeRedModal')" class="px-3 py-2 bg-red-600 text-white font-bold text-xs rounded-xl shadow-md shadow-red-600/30 animate-pulse hidden md:block">🚨 CÓDIGO ROJO</button>
+                <button onclick="openAtlas()" class="px-3 py-2 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-bold text-xs rounded-xl border border-emerald-200 dark:border-emerald-800/50 hidden md:block">🧍‍♂️ Atlas</button>
+                <button onclick="toggleModal('protocolModal')" class="px-3 py-2 bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold text-xs rounded-xl border border-purple-200 dark:border-purple-800/50 hidden lg:block">📖 Scripts</button>
                 
-                <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-xl">
+                <div class="hidden sm:flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl">
                     <span id="segmentCount" class="font-black text-blue-600 dark:text-blue-400">0</span>
                     <span class="text-[9px] font-bold uppercase text-slate-400">Términos</span>
                 </div>
-                <button onclick="toggleTheme()" id="themeBtn" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-lg">☀️</button>
+                <button onclick="toggleTheme()" id="themeBtn" class="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-lg hover:scale-105 transition">☀️</button>
             </div>
         </header>
 
-        <!-- CONTENEDOR DE PESTAÑAS (Móvil) / CUADRÍCULA (Desktop) -->
-        <div class="flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-3 min-h-0 relative">
+        <!-- CUADRÍCULA PRINCIPAL -->
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 min-h-0">
             
-            <!-- TAB 1: GLOSARIO -->
-            <div id="tab-glosario" class="mobile-tab-content active lg:!flex lg:col-span-8 flex-col gap-2 h-full w-full">
-                <!-- Buscador -->
-                <div class="bg-white dark:bg-slate-900 p-2 lg:p-3 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 shrink-0">
+            <!-- COLUMNA IZQUIERDA: SUBTÍTULOS Y GLOSARIO (8 COLS) -->
+            <div class="lg:col-span-8 flex flex-col gap-3 h-full min-h-0">
+                
+                <!-- MÓDULO DE SUBTÍTULOS BILINGÜES EN VIVO (Mantenido visible) -->
+                <div class="bg-slate-900 dark:bg-slate-950 text-white p-3 md:p-4 rounded-2xl shadow-md border border-slate-700/80 shrink-0 flex flex-col gap-2 h-44 md:h-52">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <div class="flex items-center gap-2">
+                            <span id="micPulse" class="w-3 h-3 rounded-full bg-slate-600"></span>
+                            <span class="font-black text-xs md:text-sm uppercase tracking-wider text-emerald-400">🎙️ Subtítulos (EN → ES)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleLiveCaptions()" id="btnStartCaptions" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition shadow-sm" title="Atajo: Alt+S">▶ Iniciar Captura</button>
+                            <button onclick="clearCaptionsFeed()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs font-bold rounded-lg transition" title="Limpiar">🗑️</button>
+                        </div>
+                    </div>
+                    
+                    <div id="transcriptFeed" class="flex-1 overflow-y-auto hide-scroll flex flex-col gap-2 p-1">
+                        <div id="emptyFeedMsg" class="text-slate-500 text-xs text-center mt-6 md:mt-8 font-medium italic">Presiona "Iniciar Captura". El sistema escuchará en Inglés y traducirá al Español.</div>
+                        <div id="liveInterimBox" class="hidden mt-auto"><div class="bg-slate-800/80 border border-slate-700 p-2.5 rounded-xl"><span class="animate-pulse text-[10px] font-bold text-amber-500 uppercase tracking-widest block mb-0.5">Escuchando...</span><span id="liveInterimText" class="text-slate-300 italic text-xs md:text-sm"></span></div></div>
+                    </div>
+                </div>
+
+                <!-- BUSCADOR -->
+                <div class="bg-white dark:bg-slate-900 p-2.5 md:p-3 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 shrink-0">
                     <div class="flex gap-2">
                         <div class="relative flex-1">
-                            <input type="text" id="searchInput" placeholder="Buscar síntoma, medicamento, cirugía..." class="w-full pl-3 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-base lg:text-sm" oninput="filterTerms()">
-                            <button onclick="clearSearch()" class="absolute right-3 top-2.5 text-slate-400 font-bold">✕</button>
+                            <span class="absolute left-3 top-2 text-slate-400">🔍</span>
+                            <input type="text" id="searchInput" placeholder="Buscar síntoma, medicamento, cirugía..." class="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm" oninput="filterTerms()" autofocus>
+                            <button onclick="clearSearch()" class="absolute right-3 top-2 text-slate-400 hover:text-rose-500 font-bold text-lg">×</button>
                         </div>
-                        <select id="categoryFilter" onchange="filterTerms()" class="hidden sm:block px-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold w-48">
+                        <select id="categoryFilter" onchange="filterTerms()" class="hidden md:block px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-bold w-48 focus:outline-none">
                             <option value="Todas">Todas las áreas</option>
                         </select>
                     </div>
                 </div>
-                <!-- Tabla -->
+
+                <!-- TABLA GLOSARIO -->
                 <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex-1 flex flex-col min-h-0 overflow-hidden">
-                    <div class="overflow-auto flex-1">
+                    <div class="overflow-y-auto flex-1 hide-scroll relative">
                         <table class="w-full text-left border-collapse">
-                            <thead class="sticky top-0 bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-300 z-10 text-[10px] uppercase">
+                            <thead class="sticky top-0 bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-300 z-10 text-[10px] md:text-xs uppercase tracking-wider">
                                 <tr>
-                                    <th class="py-2 px-3 font-bold w-1/3">Inglés (Clic = Copiar)</th>
-                                    <th class="py-2 px-3 font-bold w-1/3">Español</th>
-                                    <th class="py-2 px-2 font-bold w-1/3 hidden sm:table-cell">Categoría</th>
+                                    <th class="py-2.5 px-3 font-bold w-5/12">Inglés (Clic para copiar)</th>
+                                    <th class="py-2.5 px-3 font-bold w-5/12">Español</th>
+                                    <th class="py-2.5 px-3 font-bold w-2/12 hidden sm:table-cell">Categoría</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody" class="text-xs lg:text-sm divide-y divide-slate-100 dark:divide-slate-800/60"></tbody>
+                            <tbody id="tableBody" class="text-xs md:text-sm divide-y divide-slate-100 dark:divide-slate-800"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: SCRATCHPAD -->
-            <div id="tab-bloc" class="mobile-tab-content lg:!flex lg:col-span-4 flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                <!-- Header Bloc -->
-                <div class="px-3 py-2 bg-slate-900 text-white flex justify-between items-center shrink-0">
-                    <span class="font-extrabold text-xs uppercase">📝 Bloc de Llamada</span>
-                    <div class="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded-lg">
-                        <span id="callTimer" class="font-mono text-xs font-bold text-amber-400 w-10 text-center">00:00</span>
-                        <button onclick="toggleTimer()" id="timerBtn" class="px-1.5 py-0.5 bg-emerald-600 rounded font-bold text-[10px]">▶</button>
-                        <button onclick="saveCallLog()" class="px-1.5 py-0.5 bg-blue-600 rounded font-bold text-[10px]" title="Guardar turno">💾</button>
+            <!-- COLUMNA DERECHA: SCRATCHPAD Y TRACKER (4 COLS) -->
+            <div class="lg:col-span-4 flex flex-col bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden h-full min-h-[400px]">
+                
+                <div class="px-4 py-3 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-center shrink-0 border-b border-slate-800">
+                    <span class="font-black text-xs md:text-sm uppercase tracking-widest text-blue-400">📝 Bloc de Llamada</span>
+                    <div class="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700">
+                        <span id="callTimer" class="font-mono text-xs md:text-sm font-bold text-amber-400 w-11 text-center">00:00</span>
+                        <button onclick="toggleTimer()" id="timerBtn" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 rounded font-bold text-[10px] transition">▶</button>
+                        <button onclick="saveCallLog()" class="px-2 py-1 bg-blue-600 hover:bg-blue-500 rounded font-bold text-[10px] transition" title="Guardar turno">💾</button>
                     </div>
                 </div>
-                <!-- Botones Inserción -->
-                <div class="p-2 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 shrink-0 overflow-x-auto whitespace-nowrap">
-                    <div class="flex gap-1.5 mb-1.5 pb-1">
+
+                <div class="p-2.5 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-800 shrink-0">
+                    <div class="flex flex-wrap gap-1.5 mb-1.5">
                         <button onclick="insertNote('Pt: ')" class="chip-data">Pt</button>
                         <button onclick="insertNote('DOB: // ')" class="chip-data">DOB</button>
                         <button onclick="insertNote('Edad:  y/o ')" class="chip-data">Edad</button>
                         <button onclick="insertNote('Dr: ')" class="chip-data">Dr.</button>
                         <button onclick="insertNote('Dolor: /10 ')" class="chip-data">Dolor /10</button>
                         <button onclick="insertNote('BP: / ')" class="chip-data">BP</button>
-                        <button onclick="insertToday()" class="chip-data !text-blue-600">📅 Hoy</button>
                     </div>
-                    <div class="flex gap-1.5 pb-1">
+                    <div class="flex flex-wrap gap-1.5">
                         <button onclick="insertNote('↑ ')" class="chip-sym">↑</button>
                         <button onclick="insertNote('↓ ')" class="chip-sym">↓</button>
                         <button onclick="insertNote('→ ')" class="chip-sym">→</button>
@@ -174,140 +196,120 @@
                         <button onclick="insertNote('Rx: ')" class="chip-sym">Rx</button>
                     </div>
                 </div>
-                <!-- Textarea -->
-                <div class="p-2 flex-1 flex flex-col min-h-0">
-                    <textarea id="scratchpad" placeholder="Anota datos de la llamada... (Alt+⌫ destruye las notas)" class="w-full flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-amber-50/30 dark:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm lg:text-base resize-none" oninput="saveScratchpad()"></textarea>
-                    <button onclick="wipeNotes()" class="mt-2 w-full py-3 bg-red-600 hover:bg-red-700 text-white font-black text-xs rounded-xl shadow-md">🗑️ DESTRUIR NOTAS</button>
-                </div>
-                <!-- Conversores -->
-                <div class="p-2 bg-slate-100 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0 grid grid-cols-2 gap-2">
-                    <div class="flex items-center bg-white dark:bg-slate-800 rounded-lg px-2 py-1 border border-slate-300 dark:border-slate-700">
-                        <input type="number" id="lbInput" placeholder="Lbs" oninput="convertW('lb')" class="w-full bg-transparent font-bold text-xs outline-none dark:text-white">
-                        <span class="text-slate-400 px-1 text-xs">⇄</span>
-                        <input type="number" id="kgInput" placeholder="Kg" oninput="convertW('kg')" class="w-full bg-transparent font-bold text-xs text-right text-blue-600 outline-none">
-                    </div>
-                    <div class="flex items-center bg-white dark:bg-slate-800 rounded-lg px-2 py-1 border border-slate-300 dark:border-slate-700">
-                        <input type="number" id="fInput" placeholder="°F" oninput="convertT('f')" class="w-full bg-transparent font-bold text-xs outline-none dark:text-white">
-                        <span class="text-slate-400 px-1 text-xs">⇄</span>
-                        <input type="number" id="cInput" placeholder="°C" oninput="convertT('c')" class="w-full bg-transparent font-bold text-xs text-right text-rose-600 outline-none">
-                    </div>
-                </div>
-            </div>
 
-            <!-- TAB 3: SUBTÍTULOS EN VIVO -->
-            <div id="tab-subs" class="mobile-tab-content lg:hidden flex-col bg-slate-900 text-white rounded-2xl shadow-sm border border-slate-700 overflow-hidden">
-                <div class="p-3 border-b border-slate-800 flex justify-between items-center">
-                    <div class="flex items-center gap-2"><span id="micPulseMobile" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span class="font-black text-xs uppercase">🎙️ Subtítulos (EN→ES)</span></div>
-                    <button onclick="toggleLiveCaptions()" id="btnStartCaptionsMobile" class="px-3 py-1 bg-emerald-600 text-white text-xs font-bold rounded-lg">▶ Iniciar</button>
+                <div class="p-2.5 flex-1 flex flex-col min-h-0">
+                    <textarea id="scratchpad" placeholder="Anota datos de la llamada... (Alt+⌫ destruye las notas)" class="w-full flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-amber-50/40 dark:bg-slate-950/80 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm leading-relaxed resize-none shadow-inner" oninput="saveScratchpad()"></textarea>
+                    
+                    <button onclick="wipeNotes()" class="mt-2.5 w-full py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs md:text-sm rounded-xl shadow-md transition">
+                        🗑️ DESTRUIR NOTAS
+                    </button>
                 </div>
-                <div id="transcriptFeed" class="flex-1 p-3 overflow-y-auto flex flex-col gap-2">
-                    <div id="emptyFeedMsg" class="text-slate-500 text-xs text-center mt-4">Inicia la captura para transcribir al médico en vivo.</div>
-                    <div id="liveInterimBox" class="hidden mt-auto"><div class="bg-slate-800 p-2 rounded-xl text-xs text-slate-300 italic"><span id="liveInterimText"></span></div></div>
+
+                <div class="p-2.5 bg-slate-100 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0 grid grid-cols-2 gap-2">
+                    <div class="flex items-center bg-white dark:bg-slate-800 rounded-lg px-2 py-1.5 border border-slate-300 dark:border-slate-700 shadow-sm">
+                        <input type="number" id="lbInput" placeholder="Lbs" oninput="convertW('lb')" class="w-full bg-transparent font-bold text-xs outline-none dark:text-white">
+                        <span class="text-slate-400 px-1 text-xs font-bold">⇄</span>
+                        <input type="number" id="kgInput" placeholder="Kg" oninput="convertW('kg')" class="w-full bg-transparent font-bold text-xs text-right text-blue-600 dark:text-blue-400 outline-none">
+                    </div>
+                    <div class="flex items-center bg-white dark:bg-slate-800 rounded-lg px-2 py-1.5 border border-slate-300 dark:border-slate-700 shadow-sm">
+                        <input type="number" id="fInput" placeholder="°F" oninput="convertT('f')" class="w-full bg-transparent font-bold text-xs outline-none dark:text-white">
+                        <span class="text-slate-400 px-1 text-xs font-bold">⇄</span>
+                        <input type="number" id="cInput" placeholder="°C" oninput="convertT('c')" class="w-full bg-transparent font-bold text-xs text-right text-rose-600 dark:text-rose-400 outline-none">
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- NAVEGACIÓN INFERIOR MÓVIL (Solo visible en pantallas chicas < lg) -->
-    <nav class="lg:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-around p-2 pb-safe shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-        <button onclick="switchMobileTab('glosario')" id="nav-glosario" class="flex-1 flex flex-col items-center p-2 text-blue-600 dark:text-blue-400 font-bold">
-            <span class="text-xl mb-1">🔍</span><span class="text-[10px] uppercase">Glosario</span>
-        </button>
-        <button onclick="switchMobileTab('bloc')" id="nav-bloc" class="flex-1 flex flex-col items-center p-2 text-slate-400 hover:text-blue-500 transition font-bold">
-            <span class="text-xl mb-1">📝</span><span class="text-[10px] uppercase">Bloc</span>
-        </button>
-        <button onclick="switchMobileTab('subs')" id="nav-subs" class="flex-1 flex flex-col items-center p-2 text-slate-400 hover:text-blue-500 transition font-bold">
-            <span class="text-xl mb-1">🎙️</span><span class="text-[10px] uppercase">Subtítulos</span>
-        </button>
-    </nav>
-
 
     <!-- ========================================================================= -->
-    <!-- MODALES DE HERRAMIENTAS (Ocultos por defecto)                             -->
+    <!-- MODALES DE HERRAMIENTAS                                                   -->
     <!-- ========================================================================= -->
 
-    <!-- MODAL 2: MEGA-MENÚ HERRAMIENTAS 🛠️ -->
-    <div id="toolsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-slate-50 dark:bg-slate-900 w-full max-w-5xl rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
-            <div class="bg-indigo-700 text-white px-5 py-4 flex justify-between items-center shrink-0">
-                <h2 class="font-black text-lg">🛠️ Multi-Herramientas</h2>
+    <!-- MULTI-HERRAMIENTAS -->
+    <div id="toolsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+        <div class="bg-slate-50 dark:bg-slate-900 w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+            <div class="bg-indigo-700 text-white px-6 py-4 flex justify-between items-center shrink-0">
+                <h2 class="font-black text-xl">🛠️ Multi-Herramientas</h2>
                 <button onclick="toggleModal('toolsModal')" class="w-8 h-8 rounded-full bg-white/20 text-white font-bold text-xl">&times;</button>
             </div>
-            <div class="p-4 sm:p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <button onclick="toggleModal('toolsModal'); toggleModal('shiftModal'); renderShiftLog();" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-left">
-                    <div class="text-3xl mb-2">📊</div><h3 class="font-bold text-sm dark:text-white">Tracker de Turnos</h3><p class="text-[10px] text-slate-500">Historial y Excel.</p>
+            <div class="p-6 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button onclick="toggleModal('toolsModal'); toggleModal('shiftModal'); renderShiftLog();" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-left hover:border-blue-500 transition">
+                    <div class="text-4xl mb-3">📊</div><h3 class="font-bold text-sm dark:text-white">Tracker Turnos</h3><p class="text-[10px] text-slate-500">Historial y Excel.</p>
                 </button>
-                <button onclick="toggleModal('toolsModal'); toggleModal('sightModal');" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-left">
-                    <div class="text-3xl mb-2">👁️</div><h3 class="font-bold text-sm dark:text-white">Traducción a Vista</h3><p class="text-[10px] text-slate-500">Pega textos en inglés.</p>
+                <button onclick="toggleModal('toolsModal'); toggleModal('sightModal');" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-left hover:border-emerald-500 transition">
+                    <div class="text-4xl mb-3">👁️</div><h3 class="font-bold text-sm dark:text-white">Traducción Vista</h3><p class="text-[10px] text-slate-500">Práctica con textos.</p>
                 </button>
-                <button onclick="toggleModal('toolsModal'); toggleModal('refsModal');" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-left">
-                    <div class="text-3xl mb-2">🖼️</div><h3 class="font-bold text-sm dark:text-white">Ref. Visuales</h3><p class="text-[10px] text-slate-500">Dolor, heces, labs.</p>
+                <button onclick="toggleModal('toolsModal'); toggleModal('refsModal');" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-left hover:border-amber-500 transition">
+                    <div class="text-4xl mb-3">🖼️</div><h3 class="font-bold text-sm dark:text-white">Ref. Visuales</h3><p class="text-[10px] text-slate-500">Dolor, heces, labs.</p>
                 </button>
-                <button onclick="toggleModal('toolsModal'); toggleModal('rootsModal');" class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-left">
-                    <div class="text-3xl mb-2">🧩</div><h3 class="font-bold text-sm dark:text-white">Raíces Médicas</h3><p class="text-[10px] text-slate-500">Afijos y sufijos.</p>
+                <button onclick="toggleModal('toolsModal'); toggleModal('rootsModal');" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 text-left hover:border-purple-500 transition">
+                    <div class="text-4xl mb-3">🧩</div><h3 class="font-bold text-sm dark:text-white">Raíces Médicas</h3><p class="text-[10px] text-slate-500">Afijos y sufijos.</p>
                 </button>
-                <div class="sm:col-span-2 lg:col-span-4 mt-2 flex flex-col sm:flex-row gap-2">
-                    <button onclick="toggleModal('toolsModal'); toggleModal('flashcardModal'); nextFlashcard();" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-xl font-bold text-sm shadow-md transition">🧠 Modo Estudio (Flashcards)</button>
-                    <button onclick="toggleModal('toolsModal'); toggleModal('dataModal');" class="flex-1 bg-slate-700 hover:bg-slate-800 text-white p-3 rounded-xl font-bold text-sm shadow-md transition">📂 Importar CSV / Exportar</button>
+                <div class="sm:col-span-2 lg:col-span-4 mt-2 flex flex-col sm:flex-row gap-3">
+                    <button onclick="toggleModal('toolsModal'); toggleModal('flashcardModal'); nextFlashcard();" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white p-4 rounded-2xl font-bold text-base shadow-md transition">🧠 Flashcards de Estudio</button>
+                    <button onclick="toggleModal('toolsModal'); toggleModal('dataModal');" class="flex-1 bg-slate-700 hover:bg-slate-800 text-white p-4 rounded-2xl font-bold text-base shadow-md transition">📂 Importar CSV / Excel</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 3: IMPORT/EXPORT DATA -->
+    <!-- IMPORTAR CSV -->
     <div id="dataModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl flex flex-col overflow-hidden">
             <div class="bg-slate-800 text-white px-5 py-4 flex justify-between items-center"><h2 class="font-black text-lg">📂 Base de Datos</h2><button onclick="toggleModal('dataModal')" class="font-bold text-2xl">&times;</button></div>
             <div class="p-6 space-y-4 text-sm">
-                <p class="text-slate-600 dark:text-slate-400">Si tienes tu lista gigante de 8,000 palabras en Excel, guárdala como CSV (3 columnas: Categoría, Inglés, Español) y súbela aquí.</p>
+                <p class="text-slate-600 dark:text-slate-400">Si tienes tu lista de 8,000 palabras en Excel, guárdala como CSV (3 columnas: Categoría, Inglés, Español) y súbela aquí.</p>
                 <input type="file" id="csvFileInput" accept=".csv" class="w-full border p-2 rounded-lg bg-slate-50 dark:bg-slate-800 dark:text-white dark:border-slate-700">
-                <button onclick="importCSV()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl">Cargar Archivo CSV</button>
+                <button onclick="importCSV()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition">Cargar Archivo CSV</button>
                 <hr class="border-slate-200 dark:border-slate-800">
-                <button onclick="exportCSV()" class="w-full py-2 bg-emerald-600 text-white font-bold rounded-xl">Descargar Glosario Actual (CSV)</button>
-                <button onclick="resetDatabase()" class="w-full py-2 border border-red-500 text-red-500 font-bold rounded-xl">Restaurar Diccionario de Fábrica</button>
+                <button onclick="exportCSV()" class="w-full py-2 bg-emerald-600 text-white font-bold rounded-xl">Descargar Glosario (CSV)</button>
+                <button onclick="resetDatabase()" class="w-full py-2 border border-red-500 text-red-500 font-bold rounded-xl">Restaurar de Fábrica</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALES AUXILIARES (Los básicos para que no falte nada) -->
-    <div id="shiftModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl flex flex-col max-h-[85vh]"><div class="bg-slate-800 text-white px-5 py-4 flex justify-between items-center"><h2 class="font-black text-lg">📊 Turnos</h2><button onclick="toggleModal('shiftModal')" class="font-bold text-xl">&times;</button></div><div class="p-5 flex-1 overflow-auto"><button onclick="exportShiftCSV()" class="mb-4 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">📥 Exportar a Excel</button><table class="w-full text-left text-xs"><tbody id="shiftLogBody" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody></table></div></div>
-    </div>
-    
-    <div id="sightModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-3xl flex flex-col h-[85vh]"><div class="bg-emerald-700 text-white px-5 py-4 flex justify-between"><h2 class="font-black">👁️ Traducción a Vista</h2><button onclick="toggleModal('sightModal')">&times;</button></div><div class="p-5 flex-1 flex flex-col md:flex-row gap-4"><textarea id="sightInput" class="flex-1 p-3 border rounded-xl dark:bg-slate-800 text-sm" placeholder="Pega texto médico en inglés..."></textarea><div class="flex flex-col gap-2 w-full md:w-1/2"><button onclick="processSightText()" class="py-2 bg-emerald-600 text-white font-bold rounded-xl">Procesar</button><div id="sightOutput" class="flex-1 p-3 border rounded-xl dark:bg-slate-800 overflow-auto text-sm"></div></div></div></div>
-    </div>
-
-    <div id="rootsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-3xl flex flex-col h-[80vh]"><div class="bg-purple-700 text-white px-5 py-4 flex justify-between"><h2 class="font-black">🧩 Raíces Médicas</h2><button onclick="toggleModal('rootsModal')">&times;</button></div><div class="p-5 flex-1 flex flex-col"><input type="text" id="rootsSearch" placeholder="Buscar prefijo..." class="p-2 border rounded-lg mb-3 dark:bg-slate-800" oninput="filterRoots()"><div class="flex-1 overflow-auto border rounded-xl"><table class="w-full text-left text-sm"><tbody id="rootsBody" class="divide-y"></tbody></table></div></div></div>
-    </div>
-
-    <div id="refsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
-        <div class="bg-slate-50 dark:bg-slate-900 w-full max-w-4xl rounded-3xl flex flex-col h-[85vh]"><div class="bg-amber-600 text-white px-5 py-4 flex justify-between"><h2 class="font-black">🖼️ Referencias Visuales</h2><button onclick="toggleModal('refsModal')">&times;</button></div><div class="p-5 overflow-auto space-y-4"><div class="bg-white p-4 rounded-xl dark:bg-slate-800"><b>Escala Dolor Wong-Baker:</b> 😃(0) 🙂(2) 😐(4) 🙁(6) 😫(8) 😭(10)</div><div class="bg-white p-4 rounded-xl dark:bg-slate-800"><b>Signos Vitales:</b> BP < 120/80 | HR 60-100 | SpO2 > 95% | Glucosa < 100</div><div class="bg-white p-4 rounded-xl dark:bg-slate-800"><b>Escala Bristol:</b> 1-2(Estreñimiento) | 3-4(Normal) | 5-7(Diarrea)</div></div></div>
-    </div>
-
-    <div id="protocolModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-3xl flex flex-col"><div class="bg-purple-700 text-white px-5 py-4 flex justify-between"><h2 class="font-black">📖 Protocolos</h2><button onclick="toggleModal('protocolModal')">&times;</button></div><div class="p-5 text-sm dark:text-white"><div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg mb-3"><p id="script-intro" class="font-bold"></p></div><p><b>Repetición:</b> The interpreter requests a repetition, please.</p><p><b>Aclaración:</b> The interpreter requests a brief clarification...</p></div></div>
-    </div>
-
-    <div id="codeRedModal" class="hidden fixed inset-0 bg-red-950/90 backdrop-blur-md z-[80] flex items-center justify-center p-4">
-        <div class="bg-slate-900 w-full max-w-3xl rounded-3xl border-4 border-red-600 flex flex-col"><div class="bg-red-600 text-white px-5 py-4 flex justify-between"><h2 class="font-black animate-pulse">🚨 CÓDIGO ROJO</h2><button onclick="toggleModal('codeRedModal')">&times;</button></div><div class="p-5 text-slate-200 text-sm space-y-4"><div class="bg-slate-800 p-4 rounded-xl border border-red-500/30"><h3 class="text-red-500 font-bold mb-1">911 / Emergencia</h3><p>"The interpreter wishes to state for the record that this is an emergency call. I will interpret consecutively."</p></div><div class="bg-slate-800 p-4 rounded-xl border border-red-500/30"><h3 class="text-red-500 font-bold mb-1">Riesgo Suicida / Daño a terceros</h3><p>"Excuse me provider, the interpreter wishes to inform you that the patient has expressed intent to harm themselves/others."</p></div></div></div>
-    </div>
-
-    <div id="flashcardModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[80] flex items-center justify-center p-4">
-        <div class="w-full max-w-lg flex flex-col items-center"><div class="w-full flex justify-between mb-4 text-white"><h2 class="font-black text-xl">🧠 Modo Estudio</h2><button onclick="toggleModal('flashcardModal')" class="font-bold text-2xl">&times;</button></div><div id="fc-card" class="relative w-full h-64 perspective-1000 cursor-pointer" onclick="flipCard()"><div class="flashcard-inner w-full h-full relative transform-style-3d"><div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-800 rounded-3xl border-4 border-blue-500 flex flex-col items-center justify-center p-6 text-center"><h3 id="fc-front" class="text-2xl font-black dark:text-white">Term</h3></div><div class="absolute w-full h-full backface-hidden rotate-y-180 bg-blue-600 rounded-3xl border-4 border-blue-400 flex flex-col items-center justify-center p-6 text-center text-white"><h3 id="fc-back" class="text-2xl font-black">Término</h3></div></div></div><div class="mt-6 flex gap-3 w-full"><button onclick="nextFlashcard()" class="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold">Siguiente ➔</button></div></div>
-    </div>
-
+    <!-- ATLAS -->
     <div id="atlasModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-2 sm:p-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-5xl rounded-3xl flex flex-col h-[90vh]"><div class="bg-emerald-700 text-white px-5 py-4 flex justify-between"><h2 class="font-black">🧍‍♂️ Atlas</h2><button onclick="toggleModal('atlasModal')">&times;</button></div><div class="flex flex-col sm:flex-row flex-1 overflow-hidden"><div class="w-full sm:w-1/3 bg-slate-50 dark:bg-slate-950 p-4 overflow-y-auto"><button onclick="loadAtlasSystem('Nervioso')" class="w-full text-left p-3 mb-2 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold dark:text-white">🧠 Nervioso</button><button onclick="loadAtlasSystem('Respiratorio')" class="w-full text-left p-3 mb-2 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold dark:text-white">🫁 Respiratorio</button><button onclick="loadAtlasSystem('Cardiovascular')" class="w-full text-left p-3 mb-2 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold dark:text-white">🫀 Cardiovascular</button><button onclick="loadAtlasSystem('Digestivo')" class="w-full text-left p-3 mb-2 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold dark:text-white">🥪 Digestivo</button></div><div class="w-full sm:w-2/3 p-4 overflow-y-auto"><h3 id="atlas-title" class="font-black text-emerald-600 mb-3 text-lg">Selecciona</h3><div id="atlas-content" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div></div></div></div>
+        <div class="bg-white dark:bg-slate-900 w-full max-w-6xl rounded-3xl flex flex-col h-[92vh] overflow-hidden">
+            <div class="bg-emerald-700 text-white px-6 py-4 flex justify-between items-center"><h2 class="font-black text-xl">🧍‍♂️ Atlas Anatómico</h2><button onclick="toggleModal('atlasModal')" class="font-bold text-2xl">&times;</button></div>
+            <div class="flex flex-col sm:flex-row flex-1 overflow-hidden">
+                <div class="w-full sm:w-1/3 bg-slate-50 dark:bg-slate-950 p-4 overflow-y-auto">
+                    <button onclick="loadAtlasSystem('Nervioso')" class="w-full text-left p-3 mb-2 bg-emerald-600 text-white rounded-xl font-bold">🧠 Nervioso</button>
+                    <button onclick="loadAtlasSystem('Respiratorio')" class="w-full text-left p-3 mb-2 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold dark:text-white">🫁 Respiratorio</button>
+                    <button onclick="loadAtlasSystem('Cardiovascular')" class="w-full text-left p-3 mb-2 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold dark:text-white">🫀 Cardiovascular</button>
+                    <button onclick="loadAtlasSystem('Digestivo')" class="w-full text-left p-3 mb-2 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold dark:text-white">🥪 Digestivo</button>
+                    <button onclick="loadAtlasSystem('Esquelético')" class="w-full text-left p-3 mb-2 bg-slate-200 dark:bg-slate-800 rounded-xl font-bold dark:text-white">🦴 Esquelético</button>
+                </div>
+                <div class="w-full sm:w-2/3 p-5 overflow-y-auto"><h3 id="atlas-title" class="font-black text-emerald-600 mb-4 text-lg">Selecciona</h3><div id="atlas-content" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div></div>
+            </div>
+        </div>
     </div>
+
+    <!-- CODE RED -->
+    <div id="codeRedModal" class="hidden fixed inset-0 bg-red-950/90 backdrop-blur-md z-[80] flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-3xl rounded-3xl border-4 border-red-600 flex flex-col"><div class="bg-red-600 text-white px-5 py-4 flex justify-between"><h2 class="font-black animate-pulse text-lg md:text-xl">🚨 PROTOCOLOS DE EMERGENCIA</h2><button onclick="toggleModal('codeRedModal')" class="font-bold text-2xl">&times;</button></div><div class="p-5 text-slate-200 text-sm space-y-4"><div class="bg-slate-800 p-4 rounded-xl border border-red-500/30"><h3 class="text-red-500 font-bold mb-1">911 / Emergencia</h3><p>"The interpreter wishes to state for the record that this is an emergency call. I will interpret consecutively."</p></div><div class="bg-slate-800 p-4 rounded-xl border border-red-500/30"><h3 class="text-red-500 font-bold mb-1">Riesgo Suicida / Daño a terceros</h3><p>"Excuse me provider, the interpreter wishes to inform you that the patient has expressed intent to harm themselves/others."</p></div></div></div>
+    </div>
+
+    <!-- PROTOCOLOS -->
+    <div id="protocolModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-3xl flex flex-col"><div class="bg-purple-700 text-white px-5 py-4 flex justify-between"><h2 class="font-black text-lg">📖 Guiones</h2><button onclick="toggleModal('protocolModal')" class="font-bold text-2xl">&times;</button></div><div class="p-5 text-sm dark:text-white"><div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl mb-3"><p id="script-intro" class="font-bold text-base"></p></div><div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl"><p class="mb-2"><b>Repetición:</b> The interpreter requests a repetition, please.</p><p><b>Aclaración:</b> The interpreter requests a brief clarification...</p></div></div></div>
+    </div>
+
+    <!-- RESTO DE MODALES BASICOS OCULTOS... (Flashcards, Shift Tracker, Sight, Refs, Roots) -->
+    <!-- (Se reusan las mismas ventanas pequeñas de la versión anterior) -->
+    <div id="shiftModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4"><div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl flex flex-col max-h-[85vh]"><div class="bg-slate-800 text-white px-5 py-4 flex justify-between"><h2 class="font-black text-lg">📊 Turnos</h2><button onclick="toggleModal('shiftModal')" class="font-bold text-xl">&times;</button></div><div class="p-5 flex-1 overflow-auto"><button onclick="exportShiftCSV()" class="mb-4 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl">📥 Excel</button><table class="w-full text-left text-xs"><tbody id="shiftLogBody" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody></table></div></div></div>
+    <div id="sightModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4"><div class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-3xl flex flex-col h-[85vh]"><div class="bg-emerald-700 text-white px-5 py-4 flex justify-between"><h2 class="font-black">👁️ Traducción a Vista</h2><button onclick="toggleModal('sightModal')">&times;</button></div><div class="p-5 flex-1 flex flex-col md:flex-row gap-4"><textarea id="sightInput" class="flex-1 p-3 border rounded-xl dark:bg-slate-800 text-sm" placeholder="Pega texto médico en inglés..."></textarea><div class="flex flex-col gap-2 w-full md:w-1/2"><button onclick="processSightText()" class="py-2 bg-emerald-600 text-white font-bold rounded-xl">Procesar</button><div id="sightOutput" class="flex-1 p-3 border rounded-xl dark:bg-slate-800 overflow-auto text-sm"></div></div></div></div></div>
+    <div id="rootsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4"><div class="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-3xl flex flex-col h-[80vh]"><div class="bg-purple-700 text-white px-5 py-4 flex justify-between"><h2 class="font-black">🧩 Raíces Médicas</h2><button onclick="toggleModal('rootsModal')">&times;</button></div><div class="p-5 flex-1 flex flex-col"><input type="text" id="rootsSearch" placeholder="Buscar prefijo..." class="p-2 border rounded-lg mb-3 dark:bg-slate-800" oninput="filterRoots()"><div class="flex-1 overflow-auto border rounded-xl"><table class="w-full text-left text-sm"><tbody id="rootsBody" class="divide-y"></tbody></table></div></div></div></div>
+    <div id="refsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4"><div class="bg-slate-50 dark:bg-slate-900 w-full max-w-4xl rounded-3xl flex flex-col h-[85vh]"><div class="bg-amber-600 text-white px-5 py-4 flex justify-between"><h2 class="font-black">🖼️ Referencias Visuales</h2><button onclick="toggleModal('refsModal')">&times;</button></div><div class="p-5 overflow-auto space-y-4"><div class="bg-white p-4 rounded-xl dark:bg-slate-800"><b>Escala Dolor Wong-Baker:</b> 😃(0) 🙂(2) 😐(4) 🙁(6) 😫(8) 😭(10)</div><div class="bg-white p-4 rounded-xl dark:bg-slate-800"><b>Signos Vitales:</b> BP < 120/80 | HR 60-100 | SpO2 > 95% | Glucosa < 100</div><div class="bg-white p-4 rounded-xl dark:bg-slate-800"><b>Escala Bristol:</b> 1-2(Estreñimiento) | 3-4(Normal) | 5-7(Diarrea)</div></div></div></div>
+    <div id="flashcardModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[80] flex items-center justify-center p-4"><div class="w-full max-w-lg flex flex-col items-center"><div class="w-full flex justify-between mb-4 text-white"><h2 class="font-black text-xl">🧠 Modo Estudio</h2><button onclick="toggleModal('flashcardModal')" class="font-bold text-2xl">&times;</button></div><div id="fc-card" class="relative w-full h-64 perspective-1000 cursor-pointer" onclick="flipCard()"><div class="flashcard-inner w-full h-full relative transform-style-3d"><div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-800 rounded-3xl border-4 border-blue-500 flex flex-col items-center justify-center p-6 text-center"><h3 id="fc-front" class="text-3xl font-black dark:text-white">Term</h3></div><div class="absolute w-full h-full backface-hidden rotate-y-180 bg-blue-600 rounded-3xl border-4 border-blue-400 flex flex-col items-center justify-center p-6 text-center text-white"><h3 id="fc-back" class="text-3xl font-black">Término</h3></div></div></div><div class="mt-6 flex gap-3 w-full"><button onclick="nextFlashcard()" class="flex-1 py-3 bg-emerald-600 text-white rounded-xl font-bold">Siguiente ➔</button></div></div></div>
 
     <!-- ========================================================================= -->
     <!-- LOGICA JAVASCRIPT GLOBAL Y BASE DE DATOS ULTRA-DENSA                      -->
     <!-- ========================================================================= -->
     <script>
-        // Esta base de datos pura garantiza vocabulario masivo con bajo peso.
+        // BASE DE DATOS PURA (Sin frases largas para asegurar carga masiva)
         const rawDatabase = `
 [Anatomía y Órganos]
 Head|Cabeza
@@ -454,13 +456,13 @@ Hormone|Hormona
 Cell|Célula
 Tissue|Tejido
 
-[Enfermedades y Patologías]
+[Enfermedades y Condiciones]
 Asthma|Asma
 Bronchitis|Bronquitis
 Pneumonia|Neumonía / Pulmonía
 Tuberculosis|Tuberculosis
 Emphysema|Enfisema
-COPD|EPOC
+COPD|Enfermedad Pulmonar Obstructiva Crónica (EPOC)
 Hypertension|Hipertensión / Presión alta
 Hypotension|Hipotensión / Presión baja
 Heart attack / Myocardial infarction|Ataque al corazón / Infarto
@@ -522,7 +524,7 @@ Crohn's disease|Enfermedad de Crohn
 Celiac disease|Enfermedad celíaca
 Hemorrhoids|Hemorroides / Almorranas
 Kidney stones|Cálculos renales / Piedras
-UTI (Urinary tract infection)|Infección urinaria / Mal de orín
+UTI|Infección urinaria / Mal de orín
 Kidney failure|Insuficiencia renal
 Prostatitis|Prostatitis
 Endometriosis|Endometriosis
@@ -559,7 +561,7 @@ Sepsis|Sepsis
 Allergy|Alergia
 Anaphylaxis|Anafilaxia
 
-[Medicamentos]
+[Medicamentos y Fármacos]
 Acetaminophen / Paracetamol|Acetaminofén / Paracetamol
 Ibuprofen|Ibuprofeno
 Naproxen|Naproxeno
@@ -646,7 +648,7 @@ Prescription|Receta médica
 OTC (Over the counter)|De venta libre
 Refill|Resurtido / Relleno
 
-[Procedimientos y Equipo]
+[Procedimientos e Instrumental]
 Surgery|Cirugía / Operación
 Biopsy|Biopsia
 Endoscopy|Endoscopia
@@ -718,7 +720,7 @@ Incubator|Incubadora
 Stretcher|Camilla
 IV pole|Portasuero
 
-[Síntomas]
+[Síntomas y Signos]
 Pain|Dolor
 Ache|Dolor continuo
 Cramp|Calambre / Retortijón
@@ -775,6 +777,41 @@ Dehydration|Deshidratación
 Pallor|Palidez
 Jaundice|Ictericia (piel amarilla)
 Cyanosis|Cianosis (piel azulada)
+
+[Especialidades y Personal]
+Doctor / Physician|Doctor / Médico
+Nurse|Enfermero(a)
+Surgeon|Cirujano
+Anesthesiologist|Anestesiólogo
+Cardiologist|Cardiólogo
+Dermatologist|Dermatólogo
+Endocrinologist|Endocrinólogo
+Gastroenterologist|Gastroenterólogo
+Gynecologist|Ginecólogo
+Obstetrician|Obstetra
+Neurologist|Neurólogo
+Oncologist|Oncólogo
+Ophthalmologist|Oftalmólogo
+Optometrist|Optometrista
+Orthopedist|Ortopedista
+ENT|Otorrinolaringólogo
+Pediatrician|Pediatra
+Psychiatrist|Psiquiatra
+Psychologist|Psicólogo
+Pulmonologist|Neumólogo
+Radiologist|Radiólogo
+Rheumatologist|Reumatólogo
+Urologist|Urólogo
+Nephrologist|Nefrólogo
+Dentist|Dentista / Odontólogo
+Pharmacist|Farmacéutico
+Physical therapist|Fisioterapeuta
+Occupational therapist|Terapeuta ocupacional
+Dietitian / Nutritionist|Dietista / Nutricionista
+Paramedic|Paramédico
+Midwife|Partera / Comadrona
+Medical interpreter|Intérprete médico
+Patient|Paciente
 `;
 
         const medicalRootsData = [
@@ -795,33 +832,38 @@ Cyanosis|Cianosis (piel azulada)
             { r: "-plasty", m: "Reparación", e: "Rhinoplasty" }
         ];
 
-        // LOGICA GLOSARIO
-        const STORAGE_KEY = 'PWA_MedDB_V3_Pure'; // Llave maestra
+        // 1. CARGA DE BASE DE DATOS (LLAVE NUEVA Y BLINDADA)
+        const STORAGE_KEY = 'OPI_DB_ULTIMATE_1000'; // Llave completamente nueva para evitar la caché anterior
         
-        function parseDB() {
-            const lines = rawDatabase.trim().split('\n');
+        function getDatabase() {
+            let localData = null;
+            try { localData = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) {}
+            
+            // Failsafe: Si la base cargó con menos de 50 palabras (error anterior), la destruye y la re-crea.
+            if (localData && Array.isArray(localData) && localData.length > 50) {
+                return localData;
+            }
+            
             const parsed = [];
+            const lines = rawDatabase.split('\n');
             let cat = "General";
             for (let line of lines) {
                 line = line.trim();
                 if (!line) continue;
-                if (line.startsWith('[') && line.endsWith(']')) cat = line.slice(1, -1);
-                else if (line.includes('|')) {
-                    const [en, es] = line.split('|');
-                    parsed.push({ cat: cat, en: en.trim(), es: es.trim() });
+                if (line.startsWith('[') && line.endsWith(']')) {
+                    cat = line.slice(1, -1);
+                } else if (line.includes('|')) {
+                    let parts = line.split('|');
+                    parsed.push({ cat: cat, en: parts[0].trim(), es: parts[1].trim() });
                 }
             }
-            return parsed.length > 0 ? parsed : [{cat: "Error", en: "Error", es: "Fallo al cargar base"}];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+            return parsed;
         }
 
-        let medicalTerms = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (!medicalTerms || medicalTerms.length < 10) {
-            medicalTerms = parseDB();
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(medicalTerms));
-        }
-
+        let medicalTerms = getDatabase();
+        
         function normalizeStr(s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
-
         let shiftLogs = JSON.parse(localStorage.getItem('PWA_ShiftLogs')) || [];
 
         // TOAST
@@ -840,24 +882,24 @@ Cyanosis|Cianosis (piel azulada)
             showToast('📋 Copiado');
         }
 
-        // TABS MÓVILES
-        function switchMobileTab(tabId) {
-            document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('nav button').forEach(el => { el.classList.remove('text-blue-600', 'dark:text-blue-400'); el.classList.add('text-slate-400'); });
-            
-            document.getElementById('tab-' + tabId).classList.add('active');
-            const navBtn = document.getElementById('nav-' + tabId);
-            navBtn.classList.remove('text-slate-400');
-            navBtn.classList.add('text-blue-600', 'dark:text-blue-400');
-        }
-
-        // INIT UI
+        // INIT UI (Asegurar ejecución inmediata)
         function initCat() {
             const cats = [...new Set(medicalTerms.map(t => t.cat))];
             const sel = document.getElementById('categoryFilter');
+            if(!sel) return;
             sel.innerHTML = `<option value="Todas">Todas las áreas</option>`;
             cats.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
         }
+
+        const badgeColors = { 
+            "Admisión, Seguros y Legal": "bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-300",
+            "Anatomía y Órganos": "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
+            "Enfermedades y Patologías": "bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300",
+            "Medicamentos": "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300",
+            "Procedimientos e Instrumental": "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300",
+            "Síntomas y Signos": "bg-orange-100 text-orange-800 dark:bg-orange-950/60 dark:text-orange-300",
+            "Especialidades y Personal": "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
+        };
 
         function highlight(text, q) {
             if (!q || q.length === 0) return text;
@@ -872,17 +914,19 @@ Cyanosis|Cianosis (piel azulada)
 
         function renderTable(terms, query = []) {
             const tb = document.getElementById('tableBody');
+            if(!tb) return;
             document.getElementById('segmentCount').innerText = terms.length;
-            if (terms.length === 0) { tb.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-slate-500">Sin resultados. (Puedes importar CSV en Herramientas)</td></tr>`; return; }
+            if (terms.length === 0) { tb.innerHTML = `<tr><td colspan="3" class="py-10 text-center text-slate-500 font-bold">Sin resultados.</td></tr>`; return; }
             tb.innerHTML = terms.map(t => {
                 const encSpeech = t.en.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 const hEn = highlight(t.en, query);
                 const hEs = highlight(t.es, query);
+                const bClass = badgeColors[t.cat] || "bg-slate-200 text-slate-800";
                 return `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                        <td class="py-2 px-3 align-top cursor-pointer text-slate-900 dark:text-slate-100 font-bold" onclick="copyText('${encSpeech}')">${hEn} <button onclick="event.stopPropagation(); speakText('${encSpeech}')" class="text-slate-400 ml-1">🔊</button></td>
-                        <td class="py-2 px-3 align-top cursor-pointer text-slate-700 dark:text-slate-300 font-medium" onclick="copyText('${t.es.replace(/'/g, "\\'")}')">${hEs}</td>
-                        <td class="py-2 px-2 align-top text-[10px] text-slate-400 font-semibold hidden sm:table-cell">${t.cat.substring(0,18)}</td>
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition border-b border-slate-100 dark:border-slate-800/80">
+                        <td class="py-3 px-3 align-top cursor-pointer text-slate-900 dark:text-slate-100 font-bold" onclick="copyText('${encSpeech}')">${hEn} <button onclick="event.stopPropagation(); speakText('${encSpeech}')" class="text-slate-400 ml-1 hover:text-blue-500 transition">🔊</button></td>
+                        <td class="py-3 px-3 align-top cursor-pointer text-slate-700 dark:text-slate-300 font-medium" onclick="copyText('${t.es.replace(/'/g, "\\'")}')">${hEs}</td>
+                        <td class="py-3 px-3 align-top text-[10px] text-slate-400 font-bold hidden sm:table-cell uppercase tracking-wider"><span class="px-2 py-1 rounded-lg ${bClass} dark:bg-transparent border border-transparent dark:border-slate-700">${t.cat.substring(0,22)}</span></td>
                     </tr>
                 `;
             }).join('');
@@ -903,7 +947,7 @@ Cyanosis|Cianosis (piel azulada)
 
         function clearSearch() { document.getElementById('searchInput').value = ''; filterTerms(); document.getElementById('searchInput').focus(); }
 
-        // IMPORT / EXPORT EN HERRAMIENTAS
+        // IMPORT / EXPORT CSV
         function importCSV() {
             const file = document.getElementById('csvFileInput').files[0];
             if (!file) return showToast("Selecciona un archivo CSV primero");
@@ -934,11 +978,19 @@ Cyanosis|Cianosis (piel azulada)
         }
 
         function resetDatabase() {
-            if(confirm("¿Restaurar diccionario de fábrica?")) { localStorage.removeItem(STORAGE_KEY); medicalTerms = parseDB(); initCat(); filterTerms(); showToast("🔄 Base de datos restaurada"); toggleModal('dataModal'); }
+            if(confirm("¿Restaurar diccionario original? (Esto eliminará las palabras que hayas importado)")) { 
+                localStorage.removeItem(STORAGE_KEY); 
+                medicalTerms = parseDefaultDB(); // Usa el parser por defecto
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(medicalTerms));
+                initCat(); 
+                filterTerms(); 
+                showToast("🔄 Base de datos restaurada"); 
+                toggleModal('dataModal'); 
+            }
         }
 
         // ==========================================
-        // SUBTÍTULOS EN VIVO (EN -> ES) (Móvil y Desktop unificados)
+        // SUBTÍTULOS EN VIVO (EN -> ES)
         // ==========================================
         let recognition = null; let isListening = false;
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -953,18 +1005,17 @@ Cyanosis|Cianosis (piel azulada)
                     else interim += e.results[i][0].transcript;
                 }
                 
-                // Actualizar UI Mobile y Desktop
-                const boxes = document.querySelectorAll('#liveInterimBox');
-                const texts = document.querySelectorAll('#liveInterimText');
-                const emptyMsgs = document.querySelectorAll('#emptyFeedMsg');
+                const box = document.getElementById('liveInterimBox');
+                const textEl = document.getElementById('liveInterimText');
+                const emptyMsg = document.getElementById('emptyFeedMsg');
                 
-                if (interim.trim().length > 0) {
-                    emptyMsgs.forEach(m => m.classList.add('hidden'));
-                    boxes.forEach(b => b.classList.remove('hidden'));
-                    texts.forEach(t => t.innerText = interim);
+                if (interim.trim().length > 0 && box) {
+                    if(emptyMsg) emptyMsg.classList.add('hidden');
+                    box.classList.remove('hidden');
+                    textEl.innerText = interim;
                     scrollToBottomFeed();
-                } else {
-                    boxes.forEach(b => b.classList.add('hidden'));
+                } else if(box) {
+                    box.classList.add('hidden');
                 }
 
                 if (final.trim().length > 0) processFinalSegment(final.trim());
@@ -974,24 +1025,20 @@ Cyanosis|Cianosis (piel azulada)
 
         function toggleLiveCaptions() {
             if (!recognition) return alert("Usa Chrome/Edge para activar subtítulos.");
-            const btns = [document.getElementById('btnStartCaptionsMobile')];
-            const desktopBtn = document.getElementById('btnStartCaptions');
-            if(desktopBtn) btns.push(desktopBtn);
-            
-            const pulses = [document.getElementById('micPulseMobile')];
-            const desktopPulse = document.getElementById('micPulse');
-            if(desktopPulse) pulses.push(desktopPulse);
+            const btn = document.getElementById('btnStartCaptions');
+            const pulse = document.getElementById('micPulse');
 
             if (isListening) {
                 isListening = false; recognition.stop();
-                btns.forEach(b => { if(b){ b.innerText = '▶ Iniciar'; b.className = b.className.replace('bg-rose-600', 'bg-emerald-600').replace('hover:bg-rose-500', 'hover:bg-emerald-500'); } });
-                pulses.forEach(p => { if(p){ p.className = p.className.replace('bg-red-500', 'bg-slate-500').replace('animate-ping', ''); } });
-                document.querySelectorAll('#liveInterimBox').forEach(b => b.classList.add('hidden'));
+                if(btn) { btn.innerText = '▶ Iniciar Captura'; btn.className = 'px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition shadow-sm'; }
+                if(pulse) pulse.className = 'w-3 h-3 rounded-full bg-slate-600';
+                const box = document.getElementById('liveInterimBox');
+                if(box) box.classList.add('hidden');
             } else {
                 isListening = true; try { recognition.start(); } catch (err) {}
-                btns.forEach(b => { if(b){ b.innerText = '⏹ Detener'; b.className = b.className.replace('bg-emerald-600', 'bg-rose-600').replace('hover:bg-emerald-500', 'hover:bg-rose-500'); } });
-                pulses.forEach(p => { if(p){ p.className = p.className.replace('bg-slate-500', 'bg-red-500') + ' animate-ping'; } });
-                showToast('🎙️ Escuchando Inglés');
+                if(btn) { btn.innerText = '⏹ Detener'; btn.className = 'px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-lg transition shadow-sm'; }
+                if(pulse) pulse.className = 'w-3 h-3 rounded-full bg-red-500 animate-ping';
+                showToast('🎙️ Escuchando en Inglés');
             }
         }
 
@@ -1008,9 +1055,11 @@ Cyanosis|Cianosis (piel azulada)
             try {
                 const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=${encodeURIComponent(text)}`);
                 const trans = (await res.json())[0].map(i => i[0]).join('');
-                document.querySelectorAll(`#${id}-trans`).forEach(el => { el.innerText = trans; el.classList.remove('animate-pulse'); });
+                const el = document.getElementById(`${id}-trans`);
+                if(el){ el.innerText = trans; el.classList.remove('animate-pulse'); }
             } catch (err) {
-                document.querySelectorAll(`#${id}-trans`).forEach(el => { el.innerText = '⚠️ Error red'; });
+                const el = document.getElementById(`${id}-trans`);
+                if(el) el.innerText = '⚠️ Error red';
             }
         }
 
@@ -1021,53 +1070,74 @@ Cyanosis|Cianosis (piel azulada)
             }
             const html = `<div id="${id}" class="bg-slate-800 p-3 rounded-xl shadow-sm text-sm"><p class="font-semibold text-white">🇺🇸 ${original}</p><p id="${id}-trans" class="font-bold text-emerald-400 ml-5 animate-pulse">${transPl}</p>${chips}</div>`;
             
-            document.querySelectorAll('#liveInterimBox').forEach(box => box.insertAdjacentHTML('beforebegin', html));
+            const box = document.getElementById('liveInterimBox');
+            if(box) box.insertAdjacentHTML('beforebegin', html);
             
-            document.querySelectorAll('#transcriptFeed').forEach(feed => {
+            const feed = document.getElementById('transcriptFeed');
+            if(feed) {
                 const cards = feed.querySelectorAll('div[id^="seg-"]');
                 if (cards.length > 10) cards[0].remove();
                 feed.scrollTop = feed.scrollHeight;
-            });
+            }
         }
-        function scrollToBottomFeed() { document.querySelectorAll('#transcriptFeed').forEach(feed => feed.scrollTop = feed.scrollHeight); }
+        function scrollToBottomFeed() { const feed = document.getElementById('transcriptFeed'); if(feed) feed.scrollTop = feed.scrollHeight; }
+        function clearCaptionsFeed() {
+            const feed = document.getElementById('transcriptFeed');
+            if(!feed) return;
+            feed.querySelectorAll('div[id^="seg-"]').forEach(c => c.remove());
+            const textEl = document.getElementById('liveInterimText');
+            if(textEl) textEl.innerText = ''; 
+            const boxEl = document.getElementById('liveInterimBox');
+            if(boxEl) boxEl.classList.add('hidden');
+            const msgEl = document.getElementById('emptyFeedMsg');
+            if(msgEl) msgEl.classList.remove('hidden'); 
+            showToast('🗑️ Subtítulos borrados');
+        }
 
         // ==========================================
         // SCRATCHPAD & SHIFT TRACKER
         // ==========================================
         const pad = document.getElementById('scratchpad');
-        function insertNote(t) { const s=pad.selectionStart, e=pad.selectionEnd; pad.value=pad.value.substring(0,s)+t+pad.value.substring(e); pad.selectionStart=pad.selectionEnd=s+t.length; pad.focus(); saveScratchpad(); }
+        function insertNote(t) { if(!pad)return; const s=pad.selectionStart, e=pad.selectionEnd; pad.value=pad.value.substring(0,s)+t+pad.value.substring(e); pad.selectionStart=pad.selectionEnd=s+t.length; pad.focus(); saveScratchpad(); }
         function insertToday() { const d=new Date(); insertNote(`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()} `); }
-        function saveScratchpad() { sessionStorage.setItem('callNotesPWA_V3', pad.value); }
-        function wipeNotes() { pad.value=''; sessionStorage.removeItem('callNotesPWA_V3'); document.querySelectorAll('input[type="number"]').forEach(i=>i.value=''); pad.focus(); showToast('🗑️ Notas destruidas'); }
+        function saveScratchpad() { if(!pad)return; sessionStorage.setItem('callNotesPWA_V3', pad.value); const c = document.getElementById('charCounter'); if(c) c.innerText = pad.value.length + ' car.'; }
+        function wipeNotes() { if(!pad)return; pad.value=''; sessionStorage.removeItem('callNotesPWA_V3'); const c = document.getElementById('charCounter'); if(c) c.innerText='0 car.'; document.querySelectorAll('input[type="number"]').forEach(i=>i.value=''); pad.focus(); showToast('🗑️ Notas destruidas'); }
 
         let timerSecs = 0, timerInt = null;
         function updateTimer() { 
             const txt = `${String(Math.floor(timerSecs/60)).padStart(2,'0')}:${String(timerSecs%60).padStart(2,'0')}`;
-            document.querySelectorAll('#callTimer').forEach(el => el.innerText = txt);
+            const el = document.getElementById('callTimer');
+            if(el) el.innerText = txt;
         }
         function toggleTimer() { 
-            if (timerInt) { clearInterval(timerInt); timerInt = null; document.querySelectorAll('#timerBtn').forEach(b => { b.innerText = '▶'; b.className='px-1.5 py-0.5 bg-emerald-600 rounded font-bold text-[10px] text-white'; }); } 
-            else { timerInt = setInterval(() => { timerSecs++; updateTimer(); }, 1000); document.querySelectorAll('#timerBtn').forEach(b => { b.innerText = '⏸'; b.className='px-1.5 py-0.5 bg-amber-600 rounded font-bold text-[10px] text-white'; }); } 
+            const b = document.getElementById('timerBtn');
+            if (timerInt) { clearInterval(timerInt); timerInt = null; if(b){ b.innerText = '▶'; b.className='px-2 py-1 bg-emerald-600 hover:bg-emerald-500 rounded font-bold text-[10px] text-white transition';} } 
+            else { timerInt = setInterval(() => { timerSecs++; updateTimer(); }, 1000); if(b){ b.innerText = '⏸'; b.className='px-2 py-1 bg-amber-600 hover:bg-amber-500 rounded font-bold text-[10px] text-white transition';} } 
         }
         function resetTimer() { if (timerInt) toggleTimer(); timerSecs = 0; updateTimer(); }
         
         function saveCallLog() {
             if(timerSecs===0) return showToast("El cronómetro está en 0");
-            const d=new Date(); shiftLogs.push({ date: d.toLocaleDateString(), time: d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), duration: document.getElementById('callTimer').innerText });
+            const d=new Date(); 
+            const tEl = document.getElementById('callTimer');
+            if(!tEl) return;
+            shiftLogs.push({ date: d.toLocaleDateString(), time: d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), duration: tEl.innerText });
             localStorage.setItem('PWA_ShiftLogs', JSON.stringify(shiftLogs)); showToast('💾 Llamada guardada'); resetTimer(); wipeNotes();
         }
         function renderShiftLog() {
             const body = document.getElementById('shiftLogBody');
-            if(shiftLogs.length===0) { body.innerHTML='<tr><td colspan="4" class="p-4 text-center">No hay llamadas hoy. Usa 💾 en el bloc.</td></tr>'; return; }
-            body.innerHTML = shiftLogs.map((l, i) => `<tr><td class="p-2">${l.date}</td><td class="p-2">${l.time}</td><td class="p-2 text-emerald-500 font-bold">${l.duration}</td><td class="p-2 text-center"><button onclick="deleteLog(${i})" class="text-red-500 font-bold">✕</button></td></tr>`).join('');
+            if(!body) return;
+            if(shiftLogs.length===0) { body.innerHTML='<tr><td colspan="4" class="p-4 text-center text-slate-500 font-bold">No hay llamadas hoy. Usa 💾 en el bloc.</td></tr>'; return; }
+            body.innerHTML = shiftLogs.map((l, i) => `<tr class="hover:bg-slate-100 dark:hover:bg-slate-800"><td class="p-3 font-medium">${l.date}</td><td class="p-3">${l.time}</td><td class="p-3 text-emerald-600 dark:text-emerald-400 font-bold">${l.duration}</td><td class="p-3 text-center"><button onclick="deleteLog(${i})" class="text-red-500 font-bold hover:text-red-700">✕</button></td></tr>`).join('');
         }
         function deleteLog(i) { shiftLogs.splice(i,1); localStorage.setItem('PWA_ShiftLogs', JSON.stringify(shiftLogs)); renderShiftLog(); }
-        function clearShiftLog() { if(confirm("¿Borrar todo?")) { shiftLogs=[]; localStorage.setItem('PWA_ShiftLogs', JSON.stringify(shiftLogs)); renderShiftLog(); } }
-        function exportShiftCSV() { let csv="\uFEFFFecha,Hora Inicio,Duración\n"; shiftLogs.forEach(l => csv+=`"${l.date}","${l.time}","${l.duration}"\n`); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download='reporte_turnos.csv'; a.click(); }
+        function clearShiftLog() { if(confirm("¿Borrar todo el reporte?")) { shiftLogs=[]; localStorage.setItem('PWA_ShiftLogs', JSON.stringify(shiftLogs)); renderShiftLog(); } }
+        function exportShiftCSV() { let csv="\uFEFFFecha,Hora Inicio,Duración\n"; shiftLogs.forEach(l => csv+=`"${l.date}","${l.time}","${l.duration}"\n`); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download='reporte_turnos.csv'; a.click(); showToast('📥 Exportado');}
 
         // CONVERSORES Y RELOJES
         function convertW(s) { const k=document.getElementById('kgInput'), l=document.getElementById('lbInput'); if(s==='kg') l.value=k.value?(k.value*2.20462).toFixed(1):''; else k.value=l.value?(l.value/2.20462).toFixed(1):''; }
         function convertT(s) { const c=document.getElementById('cInput'), f=document.getElementById('fInput'); if(s==='c') f.value=c.value?((c.value*9/5)+32).toFixed(1):''; else c.value=f.value?((f.value-32)*5/9).toFixed(1):''; }
+        function convertHeight() { const cm = parseFloat(document.getElementById('cmInput').value), out = document.getElementById('ftOutput'); if (!cm) return out.innerText = `ft'in"`; const t = cm/2.54; out.innerText = `${Math.floor(t/12)}'${Math.round(t%12)}"`; }
         function updateClocks() {
             const now = new Date(), opts = { hour: '2-digit', minute: '2-digit', hour12: true };
             if(document.getElementById('time-cr')){
@@ -1085,11 +1155,11 @@ Cyanosis|Cianosis (piel azulada)
             if(!txt) return;
             document.getElementById('sightOutput').innerHTML = txt.split(/\s+/).map(word => {
                 const cw = word.replace(/[^a-zA-Z]/g, '');
-                return cw.length>3 ? `<span class="cursor-pointer font-bold text-blue-600 underline decoration-blue-200" onclick="searchFromSight('${cw}')">${word}</span>` : word;
+                return cw.length>3 ? `<span class="cursor-pointer font-bold text-blue-600 dark:text-blue-400 hover:underline" onclick="searchFromSight('${cw}')">${word}</span>` : word;
             }).join(' ');
         }
-        function searchFromSight(w) { toggleModal('sightModal'); switchMobileTab('glosario'); document.getElementById('categoryFilter').value='Todas'; document.getElementById('searchInput').value=w; filterTerms(); }
-        function filterRoots() { const q = normalizeStr(document.getElementById('rootsSearch').value); document.getElementById('rootsBody').innerHTML = medicalRootsData.filter(r => normalizeStr(r.r+r.m).includes(q)).map(r => `<tr><td class="p-3 font-bold text-purple-600">${r.r}</td><td class="p-3">${r.m}</td><td class="p-3 text-slate-500 text-xs italic">${r.e}</td></tr>`).join(''); }
+        function searchFromSight(w) { toggleModal('sightModal'); document.getElementById('categoryFilter').value='Todas'; document.getElementById('searchInput').value=w; filterTerms(); }
+        function filterRoots() { const q = normalizeStr(document.getElementById('rootsSearch').value); document.getElementById('rootsBody').innerHTML = medicalRootsData.filter(r => normalizeStr(r.r+r.m).includes(q)).map(r => `<tr class="hover:bg-slate-100 dark:hover:bg-slate-800"><td class="p-3 font-bold text-purple-600 dark:text-purple-400">${r.r}</td><td class="p-3 font-medium">${r.m}</td><td class="p-3 text-slate-500 dark:text-slate-400 text-xs italic">${r.e}</td></tr>`).join(''); }
 
         // UTILIDADES Y MODALES
         function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
@@ -1102,7 +1172,7 @@ Cyanosis|Cianosis (piel azulada)
             const agency = document.getElementById('agencySelect').value;
             const idVal = localStorage.getItem('interpreterSavedId') || '[ID]';
             const scripts = {
-                "Konnect CX": `"Hello, my name is Dykembel, interpreter ID ${idVal}. I will be your Spanish interpreter today. How may I help you?"`,
+                "Konnect CX": `"Hello, my name is Dykembel, interpreter ID ${idVal}. I will be your Spanish medical interpreter today. How may I help you?"`,
                 "MultilingualInt": `"Hello, my name is Dykembel, ID ${idVal}. I will be the Spanish interpreter. Please speak in short pauses. Go ahead."`,
                 "Nuvo CX": `"Spanish interpreter Dykembel speaking, ID ${idVal}. Everything said will be kept confidential. I am ready when you are."`
             };
@@ -1136,10 +1206,10 @@ Cyanosis|Cianosis (piel azulada)
                 "Sentidos": [{ en: "Eye", es: "Ojo", q: "Eye" },{ en: "Ear", es: "Oído", q: "Ear" },{ en: "Throat", es: "Garganta", q: "Throat" }]
             };
             document.getElementById('atlas-content').innerHTML = atlasData[sys].map(item => `
-                <div class="flex justify-between items-center p-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl">
-                    <div><p class="font-bold dark:text-white">${item.en}</p><p class="text-xs text-slate-500">${item.es}</p></div>
-                    <div class="flex gap-1"><button onclick="speakText('${item.en}')" class="p-2 bg-emerald-100 text-emerald-600 rounded-lg">🔊</button>
-                    <button onclick="toggleModal('atlasModal'); switchMobileTab('glosario'); document.getElementById('searchInput').value='${item.q}'; filterTerms();" class="p-2 bg-blue-100 text-blue-600 rounded-lg">🔍</button></div>
+                <div class="flex justify-between items-center p-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-emerald-500 transition">
+                    <div><p class="font-bold dark:text-white">${item.en}</p><p class="text-xs text-slate-500 font-medium">${item.es}</p></div>
+                    <div class="flex gap-1"><button onclick="speakText('${item.en}')" class="p-2 bg-emerald-100 text-emerald-600 rounded-lg font-bold">🔊</button>
+                    <button onclick="toggleModal('atlasModal'); document.getElementById('searchInput').value='${item.q}'; filterTerms();" class="p-2 bg-blue-100 text-blue-600 rounded-lg font-bold">🔍</button></div>
                 </div>
             `).join('');
         }
@@ -1153,7 +1223,7 @@ Cyanosis|Cianosis (piel azulada)
 
         document.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('interpreterSavedId')) document.getElementById('interpreterIdInput').value = localStorage.getItem('interpreterSavedId');
-            if (sessionStorage.getItem('callNotesPWA_V3')) pad.value = sessionStorage.getItem('callNotesPWA_V3');
+            if (sessionStorage.getItem('callNotesPWA_V3') && pad) pad.value = sessionStorage.getItem('callNotesPWA_V3');
             initCat(); filterTerms(); updateAgencyScripts(); filterRoots(); loadAtlasSystem('Nervioso');
         });
     </script>
