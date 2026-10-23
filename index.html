@@ -13,27 +13,11 @@
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.3s ease-out forwards',
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    }
-                }
-            }
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'], } } }
         }
         if (localStorage.theme === 'light') { document.documentElement.classList.remove('dark'); } 
         else { document.documentElement.classList.add('dark'); }
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(err => console.log('SW:', err)); }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(e => console.log('SW:', e)); }
     </script>
     <style>
         ::-webkit-scrollbar { width: 7px; height: 7px; }
@@ -42,40 +26,30 @@
         .dark ::-webkit-scrollbar-thumb { background: #334155; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-        /* Botones del Scratchpad */
-        .chip-data {
-            padding: 4px 8px; font-size: 11px; font-weight: 600; border-radius: 6px;
-            border: 1px solid #cbd5e1; background-color: #ffffff; color: #1e293b;
-            transition: all 0.15s ease; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        }
+        .chip-data { padding: 4px 8px; font-size: 11px; font-weight: 600; border-radius: 6px; border: 1px solid #cbd5e1; background-color: #ffffff; color: #1e293b; transition: all 0.15s ease; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
         .dark .chip-data { background-color: #1e293b; border-color: #334155; color: #e2e8f0; }
         .chip-data:hover { background-color: #eff6ff; border-color: #3b82f6; color: #1d4ed8; transform: translateY(-1px); }
         .dark .chip-data:hover { background-color: #1e3a8a; border-color: #60a5fa; color: #ffffff; }
 
-        .chip-sym {
-            padding: 4px 8px; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
-            border-radius: 6px; border: 1px solid #c7d2fe; background-color: #eef2ff;
-            color: #4338ca; transition: all 0.15s ease; cursor: pointer;
-        }
+        .chip-sym { padding: 4px 8px; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; border-radius: 6px; border: 1px solid #c7d2fe; background-color: #eef2ff; color: #4338ca; transition: all 0.15s ease; cursor: pointer; }
         .dark .chip-sym { background-color: rgba(49, 46, 129, 0.45); border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc; }
         .chip-sym:hover { background-color: #e0e7ff; border-color: #6366f1; transform: translateY(-1px); }
         .dark .chip-sym:hover { background-color: rgba(67, 56, 202, 0.7); color: #ffffff; }
 
-        /* Resaltado del buscador */
         mark.hl { background-color: rgba(250, 204, 21, 0.35); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: 700; }
         .dark mark.hl { background-color: rgba(234, 179, 8, 0.4); color: #fef08a; }
 
-        /* Zonas interactivas del SVG Anatómico */
         .body-zone { transition: all 0.25s ease; cursor: pointer; }
         .body-zone:hover, .body-zone.active-zone { filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.8)); fill: #10b981 !important; opacity: 0.95 !important; }
 
-        /* Flashcards 3D */
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
         .flashcard-inner { transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1); }
         .flipped .flashcard-inner { transform: rotateY(180deg); }
+        
+        .word-hover:hover { background-color: rgba(59, 130, 246, 0.3); border-radius: 4px; padding: 0 2px; transition: 0.2s; }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen lg:h-screen lg:overflow-hidden flex flex-col transition-colors duration-200">
@@ -99,9 +73,8 @@
             <div>🇺🇸 ET: <span id="time-et" class="font-bold text-rose-400">--:--</span></div>
         </div>
         <div class="hidden xl:flex items-center gap-2 text-[10px] text-slate-400 font-sans">
-            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">Alt+S</kbd> Transcribir</span>
-            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">Alt+L</kbd> IDIOMA</span>
-            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">ESC</kbd> Limpiar</span>
+            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">Alt+S</kbd> Subtítulos (EN)</span>
+            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">ESC</kbd> Limpiar Búsqueda</span>
             <span><kbd class="px-1.5 py-0.5 bg-red-950 text-red-300 rounded border border-red-800">Alt+⌫</kbd> Destruir Notas</span>
         </div>
     </div>
@@ -137,21 +110,23 @@
                 </div>
             </div>
 
-            <!-- Botones de Módulos -->
+            <!-- Botones de Módulos (NUEVOS MÓDULOS INTEGRADOS) -->
             <div class="flex flex-wrap items-center justify-end gap-2 w-full xl:w-auto">
-                <button onclick="openAtlas()" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-xs rounded-xl transition border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
-                    <span>🧍‍♂️</span> Atlas Anatómico
+                <button onclick="toggleModal('codeRedModal')" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl transition shadow-md shadow-red-600/30 flex items-center gap-1.5 animate-pulse">
+                    🚨 CÓDIGO ROJO
                 </button>
-                <button onclick="openFlashcards()" class="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-xs rounded-xl transition border border-amber-500/30 flex items-center gap-1.5 shadow-sm">
-                    <span>🧠</span> Flashcards
+                <div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-1"></div>
+                
+                <button onclick="toggleModal('toolsModal')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/40 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded-xl transition border border-indigo-200 dark:border-indigo-800/50 flex items-center gap-1.5">
+                    🛠️ Multi-Herramientas
                 </button>
-                <button onclick="toggleModal('protocolModal')" class="px-3 py-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold text-xs rounded-xl transition border border-purple-500/30 flex items-center gap-1.5 shadow-sm">
-                    <span>📖</span> Protocolos
+                <button onclick="openAtlas()" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 font-bold text-xs rounded-xl hover:bg-emerald-200 dark:hover:bg-emerald-900/60 transition border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-1.5">
+                    🧍‍♂️ Atlas
                 </button>
-                <button onclick="toggleAddDrawer()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition border border-slate-200 dark:border-slate-700 flex items-center gap-1" title="Añadir términos o exportar CSV">
-                    <span>➕</span> Glosario / CSV
+                <button onclick="toggleModal('protocolModal')" class="px-3 py-1.5 bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 font-bold text-xs rounded-xl hover:bg-purple-200 dark:hover:bg-purple-900/60 transition border border-purple-200 dark:border-purple-800/50">
+                    📖 Protocolos
                 </button>
-
+                
                 <div class="flex items-center gap-1.5 bg-blue-50/80 dark:bg-slate-800/90 border border-blue-200/80 dark:border-slate-700 px-3 py-1 rounded-xl">
                     <div class="text-right pr-2 border-r border-blue-200 dark:border-slate-700">
                         <span id="segmentCount" class="block text-xs font-black text-blue-700 dark:text-blue-400 leading-none">0</span>
@@ -163,23 +138,9 @@
                     </div>
                 </div>
 
-                <button onclick="toggleTheme()" id="themeBtn" class="p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition border border-slate-200 dark:border-slate-700" title="Cambiar tema visual">☀️</button>
+                <button onclick="toggleTheme()" id="themeBtn" class="p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition border border-slate-200 dark:border-slate-700">☀️</button>
             </div>
         </header>
-
-        <!-- PANEL DESPLEGABLE DE AÑADIR -->
-        <div id="addDrawer" class="hidden bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm border border-blue-200 dark:border-slate-800 shrink-0 transition-all">
-            <div class="flex flex-col md:flex-row gap-2 items-center">
-                <input type="text" id="newEn" placeholder="Término en Inglés..." class="w-full md:flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <input type="text" id="newEs" placeholder="Traducción en Español..." class="w-full md:flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <select id="newCat" class="w-full md:w-56 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-                <div class="flex gap-2 w-full md:w-auto">
-                    <button onclick="addTerm()" class="flex-1 md:flex-initial bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs transition">Guardar</button>
-                    <button onclick="exportCSV()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition">CSV</button>
-                    <button onclick="resetDatabase()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-950 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg transition">Restaurar Base</button>
-                </div>
-            </div>
-        </div>
 
         <!-- CUERPO: GLOSARIO + SUBTÍTULOS (8 COLS) Y SCRATCHPAD (4 COLS) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch flex-1 min-h-0">
@@ -187,32 +148,21 @@
             <!-- COLUMNA IZQUIERDA -->
             <div class="lg:col-span-8 flex flex-col min-h-0 gap-2.5 h-full">
 
-                <!-- 🔴 NUEVO MÓDULO DE SUBTÍTULOS (FEED FLUIDO) 🔴 -->
-                <div class="bg-slate-900 dark:bg-slate-950 text-white p-3 rounded-2xl shadow-md border border-slate-700/80 shrink-0 flex flex-col gap-2 h-64 transition-all">
-                    
-                    <!-- Controles de Subtítulos -->
+                <!-- SUBTÍTULOS EN VIVO (SOLO INGLÉS A ESPAÑOL) -->
+                <div class="bg-slate-900 dark:bg-slate-950 text-white p-3 rounded-2xl shadow-md border border-slate-700/80 shrink-0 flex flex-col gap-2 h-[220px] transition-all relative">
                     <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-800 pb-2 shrink-0">
                         <div class="flex items-center gap-2">
                             <span id="micPulse" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-                            <span class="font-black text-xs uppercase tracking-wider text-slate-100 flex items-center gap-1.5">🎙️ Subtítulos en Vivo</span>
+                            <span class="font-black text-xs uppercase tracking-wider text-slate-100 flex items-center gap-1.5">🎙️ Subtítulos Clínicos (EN → ES)</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="toggleLiveLang()" id="btnLiveLang" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold rounded-lg transition shadow-sm" title="Alternar idioma (Alt+L)">
-                                🇺🇸 EN → ES
-                            </button>
-                            <button onclick="toggleLiveCaptions()" id="btnStartCaptions" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-lg transition shadow-sm" title="Atajo: Alt+S">
-                                ▶ Capturar Audio
-                            </button>
+                            <span class="px-2.5 py-1 bg-blue-900/50 text-blue-300 border border-blue-800 text-[10px] font-bold rounded-lg">Solo Inglés</span>
+                            <button onclick="toggleLiveCaptions()" id="btnStartCaptions" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-lg transition shadow-sm" title="Atajo: Alt+S">▶ Iniciar Captura</button>
                             <button onclick="clearCaptionsFeed()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-bold rounded-lg transition" title="Limpiar historial">🗑️</button>
                         </div>
                     </div>
-
-                    <!-- FEED DE TRANSCRIPCIÓN CONTINUA -->
                     <div id="transcriptFeed" class="flex-1 overflow-y-auto pr-2 flex flex-col gap-2.5 scroll-smooth">
-                        <!-- El historial de frases aparecerá aquí como burbujas -->
-                        <div id="emptyFeedMsg" class="text-slate-500 text-xs text-center mt-6 italic">Presiona "Capturar Audio" o Alt+S para comenzar a transcribir...</div>
-                        
-                        <!-- Caja para texto "Interim" (Lo que se está escuchando AHORA mismo) -->
+                        <div id="emptyFeedMsg" class="text-slate-500 text-xs text-center mt-6 italic">Presiona "Iniciar Captura" o Alt+S. El sistema escuchará al doctor (Inglés) y lo traducirá al Español.</div>
                         <div id="liveInterimBox" class="hidden mt-auto pt-2">
                             <div class="inline-block bg-slate-800/50 border border-slate-700 px-3 py-2 rounded-xl">
                                 <span class="animate-pulse text-[10px] font-bold text-amber-500 uppercase tracking-widest block mb-0.5">Escuchando...</span>
@@ -227,16 +177,11 @@
                     <div class="flex flex-col sm:flex-row gap-2">
                         <div class="relative flex-1">
                             <span class="absolute left-3.5 top-2 text-slate-400 text-sm">🔍</span>
-                            <input 
-                                type="text" id="searchInput" 
-                                placeholder="Busca síntoma, fármaco, cirugía o jerga (ej. empacho)..." 
-                                class="w-full pl-9 pr-9 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-all"
-                                oninput="filterTerms()"
-                            >
+                            <input type="text" id="searchInput" placeholder="Busca síntoma, fármaco, cirugía o jerga (ej. empacho)..." class="w-full pl-9 pr-9 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-all" oninput="filterTerms()" autofocus>
                             <button onclick="clearSearch()" class="absolute right-3 top-1.5 text-slate-400 hover:text-rose-500 font-bold text-sm" title="Limpiar búsqueda (ESC)">✕</button>
                         </div>
-                        <select id="categoryFilter" onchange="filterTerms()" class="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold sm:w-64 cursor-pointer">
-                            <option value="Todas">Todas las especialidades (24)</option>
+                        <select id="categoryFilter" onchange="filterTerms()" class="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-bold sm:w-56 cursor-pointer">
+                            <option value="Todas">Todas (24)</option>
                         </select>
                     </div>
                     
@@ -271,19 +216,20 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: SCRATCHPAD (4 COLS) -->
+            <!-- COLUMNA DERECHA: SCRATCHPAD & SHIFT TRACKER (4 COLS) -->
             <div class="lg:col-span-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 flex flex-col min-h-[500px] lg:h-full overflow-hidden">
                 
-                <!-- Cabecera del Scratchpad -->
+                <!-- Cabecera del Scratchpad & SHIFT TRACKER -->
                 <div class="px-3.5 py-2 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-center shrink-0 border-b border-slate-800">
                     <div class="flex items-center gap-2">
-                        <span class="font-extrabold text-xs tracking-wider uppercase flex items-center gap-1.5">📝 Scratchpad</span>
+                        <span class="font-extrabold text-xs tracking-wider uppercase flex items-center gap-1.5">📝 Bloc</span>
                         <span class="text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.5 rounded uppercase">HIPAA Safe</span>
                     </div>
-                    <div class="flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 px-2.5 py-1 rounded-xl">
-                        <span id="callTimer" class="font-mono text-xs font-bold text-amber-400">00:00</span>
-                        <button onclick="toggleTimer()" id="timerBtn" class="text-[10px] px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 rounded text-white font-bold transition" title="Iniciar/Pausar">▶</button>
-                        <button onclick="resetTimer()" class="text-[10px] px-1.5 py-0.5 bg-slate-700 hover:bg-slate-600 rounded text-white font-bold transition" title="Reiniciar">↺</button>
+                    <div class="flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 px-2 py-0.5 rounded-lg">
+                        <span id="callTimer" class="font-mono text-xs font-bold text-amber-400 w-10 text-center">00:00</span>
+                        <button onclick="toggleTimer()" id="timerBtn" class="text-[10px] px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 rounded text-white font-bold transition">▶</button>
+                        <button onclick="resetTimer()" class="text-[10px] px-1.5 py-0.5 bg-slate-700 hover:bg-slate-600 rounded text-white font-bold transition">↺</button>
+                        <button onclick="saveCallLog()" class="text-[10px] px-1.5 py-0.5 bg-blue-600 hover:bg-blue-500 rounded text-white font-bold transition shadow-sm ml-1" title="Guardar llamada en Reporte de Turno">💾</button>
                     </div>
                 </div>
 
@@ -324,13 +270,13 @@
                 <div class="p-2 flex-1 flex flex-col min-h-0">
                     <textarea 
                         id="scratchpad" 
-                        placeholder="Anota dosis, fechas, números y datos aquí...&#10;&#10;Destruye las notas al finalizar con Alt + Backspace."
+                        placeholder="Anota dosis, fechas, números y datos aquí...&#10;&#10;Destruye las notas al finalizar la llamada (Alt + ⌫)."
                         class="w-full flex-1 p-3 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm leading-relaxed resize-none bg-amber-50/40 dark:bg-slate-950 text-slate-900 dark:text-slate-100 shadow-inner transition-all"
                         oninput="saveScratchpad()"
                     ></textarea>
                     
                     <div class="mt-2 flex items-center justify-between gap-2 shrink-0">
-                        <span id="charCounter" class="text-[11px] font-mono text-slate-400">0 car.</span>
+                        <span id="charCounter" class="text-[11px] font-mono text-slate-400 ml-1">0 car.</span>
                         <button onclick="wipeNotes()" class="flex-1 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-[0.99] text-white font-extrabold text-xs rounded-xl shadow-md transition flex justify-center items-center gap-1.5">
                             🗑️ DESTRUIR NOTAS (ALT + ⌫)
                         </button>
@@ -362,20 +308,232 @@
         </div>
     </div>
 
-    <!-- MODAL ATLAS ANATÓMICO -->
-    <div id="atlasModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4">
-        <!-- Código del atlas idéntico a tu última versión, respetando su funcionamiento... -->
+    <!-- ========================================================================= -->
+    <!-- MODALES (VENTANAS EMERGENTES)                                             -->
+    <!-- ========================================================================= -->
+
+    <!-- MODAL 1: CÓDIGO ROJO 🚨 -->
+    <div id="codeRedModal" class="hidden fixed inset-0 bg-red-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 w-full max-w-4xl rounded-3xl shadow-2xl border-4 border-red-600 flex flex-col h-[85vh] overflow-hidden">
+            <div class="bg-red-600 text-white px-6 py-4 flex justify-between items-center shrink-0">
+                <h2 class="font-black text-xl md:text-2xl flex items-center gap-2 animate-pulse">🚨 PROTOCOLOS DE EMERGENCIA (CODE RED)</h2>
+                <button onclick="toggleModal('codeRedModal')" class="w-10 h-10 rounded-full bg-black/20 hover:bg-black/40 text-white font-bold text-2xl flex items-center justify-center transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6 text-slate-200">
+                <p class="text-sm text-red-300 font-bold uppercase tracking-wider mb-4 border-b border-red-900 pb-2">Mantén la calma. Usa estas frases en tercera persona de inmediato.</p>
+                
+                <!-- 911 / EMS -->
+                <div class="bg-slate-800 p-5 rounded-2xl border border-red-500/30">
+                    <h3 class="text-lg font-black text-red-500 mb-2">📞 Llamada al 911 / Despacho Médico</h3>
+                    <p class="text-base font-medium">"The interpreter wishes to state for the record that this is a 911/emergency call. I am the Spanish interpreter. Please proceed with your questions and I will interpret them consecutively."</p>
+                </div>
+
+                <!-- Riesgo Suicida -->
+                <div class="bg-slate-800 p-5 rounded-2xl border border-red-500/30">
+                    <h3 class="text-lg font-black text-red-500 mb-2">🔪 Ideación Suicida o Daño a Terceros (Self-Harm/Homicidal Intent)</h3>
+                    <p class="text-base font-medium mb-3">"Excuse me provider, the interpreter wishes to inform you that the patient has expressed intent to harm themselves (or others). The interpreter will now interpret exactly what was said."</p>
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
+                        <p class="text-sm text-slate-400 italic">Si el paciente te lo dice a ti mientras el doctor no escucha:</p>
+                        <p class="text-sm text-white font-semibold">"Señor/a, como intérprete estoy obligado/a a informar al doctor sobre lo que acaba de decir para que puedan ayudarle. Procederé a interpretar su comentario."</p>
+                    </div>
+                </div>
+
+                <!-- Abuso CPS/APS -->
+                <div class="bg-slate-800 p-5 rounded-2xl border border-red-500/30">
+                    <h3 class="text-lg font-black text-red-500 mb-2">🛑 Sospecha de Abuso (Child/Adult Protective Services)</h3>
+                    <p class="text-base font-medium mb-3">"The interpreter wishes to clarify that standard mandatory reporting protocols apply. I will interpret the statements accurately so the provider can take appropriate action."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: MEGA-MENÚ HERRAMIENTAS 🛠️ -->
+    <div id="toolsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+        <div class="bg-slate-50 dark:bg-slate-900 w-full max-w-5xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-700 text-white px-6 py-4 flex justify-between items-center shrink-0">
+                <h2 class="font-black text-xl flex items-center gap-2">🛠️ Multi-Herramientas Clínicas</h2>
+                <button onclick="toggleModal('toolsModal')" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xl flex items-center justify-center transition">&times;</button>
+            </div>
+            
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-100 dark:bg-slate-950">
+                
+                <!-- Botón: Tracker de Turnos -->
+                <button onclick="toggleModal('toolsModal'); toggleModal('shiftModal'); renderShiftLog();" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition text-left group">
+                    <div class="text-4xl mb-3 group-hover:scale-110 transition-transform origin-left">📊</div>
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-1">Tracker de Turnos</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Ver historial de llamadas del día y exportar Excel para facturación.</p>
+                </button>
+
+                <!-- Botón: Sight Translation -->
+                <button onclick="toggleModal('toolsModal'); toggleModal('sightModal');" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-md transition text-left group">
+                    <div class="text-4xl mb-3 group-hover:scale-110 transition-transform origin-left">👁️</div>
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-1">Traducción a la Vista</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Pega un texto en inglés y haz clic en palabras difíciles para traducirlas al vuelo.</p>
+                </button>
+
+                <!-- Botón: Referencias Visuales -->
+                <button onclick="toggleModal('toolsModal'); toggleModal('refsModal');" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-amber-500 dark:hover:border-amber-500 hover:shadow-md transition text-left group">
+                    <div class="text-4xl mb-3 group-hover:scale-110 transition-transform origin-left">🖼️</div>
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-1">Referencias Visuales</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Escala del dolor Wong-Baker, heces de Bristol y valores normales de laboratorio.</p>
+                </button>
+
+                <!-- Botón: Raíces Médicas -->
+                <button onclick="toggleModal('toolsModal'); toggleModal('rootsModal');" class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 hover:border-purple-500 dark:hover:border-purple-500 hover:shadow-md transition text-left group">
+                    <div class="text-4xl mb-3 group-hover:scale-110 transition-transform origin-left">🧩</div>
+                    <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-1">Raíces Médicas</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Diccionario rápido de afijos y sufijos para deducir jerga médica desconocida.</p>
+                </button>
+
+                <div class="lg:col-span-4 mt-2">
+                    <button onclick="toggleModal('flashcardModal'); nextFlashcard();" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white p-4 rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition">
+                        🧠 Abrir Modo Estudio (Flashcards)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2.1: SHIFT TRACKER 📊 -->
+    <div id="shiftModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col max-h-[85vh]">
+            <div class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center shrink-0 rounded-t-3xl">
+                <h2 class="font-black text-xl">📊 Registro de Turnos y Llamadas</h2>
+                <button onclick="toggleModal('shiftModal')" class="text-slate-400 hover:text-white font-bold text-2xl">&times;</button>
+            </div>
+            <div class="p-6 flex-1 overflow-y-auto">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-800 dark:text-white">Llamadas Registradas</h3>
+                        <p class="text-xs text-slate-500">Se guardan al hacer clic en 💾 en el cronómetro.</p>
+                    </div>
+                    <button onclick="exportShiftCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow-sm">📥 Exportar a Excel</button>
+                </div>
+                <div class="bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs uppercase">
+                            <tr><th class="p-3">Fecha</th><th class="p-3">Hora Inicio</th><th class="p-3">Duración</th><th class="p-3 text-center">Acción</th></tr>
+                        </thead>
+                        <tbody id="shiftLogBody" class="divide-y divide-slate-200 dark:divide-slate-800">
+                            <!-- JS Inyecta el log -->
+                        </tbody>
+                    </table>
+                </div>
+                <button onclick="clearShiftLog()" class="mt-4 w-full py-2 border border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950 font-bold text-xs rounded-xl transition">Borrar Historial Completo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2.2: SIGHT TRANSLATION 👁️ -->
+    <div id="sightModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col h-[85vh]">
+            <div class="bg-emerald-700 text-white px-6 py-4 flex justify-between items-center shrink-0 rounded-t-3xl">
+                <h2 class="font-black text-xl">👁️ Práctica: Traducción a la Vista</h2>
+                <button onclick="toggleModal('sightModal')" class="text-emerald-200 hover:text-white font-bold text-2xl">&times;</button>
+            </div>
+            <div class="p-5 flex flex-col h-full gap-4 bg-slate-50 dark:bg-slate-950">
+                <div class="flex-1 flex flex-col md:flex-row gap-4 min-h-0">
+                    <div class="w-full md:w-1/2 flex flex-col gap-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase">1. Pega el documento médico aquí (Inglés):</label>
+                        <textarea id="sightInput" class="flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm resize-none"></textarea>
+                        <button onclick="processSightText()" class="py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition">2. Procesar Texto Interactivo ➔</button>
+                    </div>
+                    <div class="w-full md:w-1/2 flex flex-col gap-2">
+                        <label class="text-xs font-bold text-slate-500 uppercase">3. Haz clic en palabras difíciles para traducirlas:</label>
+                        <div id="sightOutput" class="flex-1 p-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 overflow-y-auto text-base leading-relaxed">
+                            <span class="text-slate-400 italic">El texto interactivo aparecerá aquí...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2.3: RAÍCES MÉDICAS 🧩 -->
+    <div id="rootsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col h-[80vh]">
+            <div class="bg-purple-700 text-white px-6 py-4 flex justify-between items-center shrink-0 rounded-t-3xl">
+                <h2 class="font-black text-xl">🧩 Desencriptador de Raíces Médicas</h2>
+                <button onclick="toggleModal('rootsModal')" class="text-purple-200 hover:text-white font-bold text-2xl">&times;</button>
+            </div>
+            <div class="p-5 flex flex-col h-full bg-slate-50 dark:bg-slate-950">
+                <input type="text" id="rootsSearch" placeholder="Busca un prefijo o sufijo (ej. -ectomy, cardio-, hyper-)..." class="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4" oninput="filterRoots()">
+                <div class="flex-1 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 dark:bg-slate-950 text-slate-500 uppercase text-xs sticky top-0">
+                            <tr><th class="p-3">Raíz / Afijo</th><th class="p-3">Significado</th><th class="p-3">Ejemplo</th></tr>
+                        </thead>
+                        <tbody id="rootsBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-800 dark:text-slate-300">
+                            <!-- JS Inyecta las raíces -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2.4: REFERENCIAS VISUALES 🖼️ -->
+    <div id="refsModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+        <div class="bg-slate-50 dark:bg-slate-900 w-full max-w-5xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col h-[85vh]">
+            <div class="bg-amber-600 text-white px-6 py-4 flex justify-between items-center shrink-0 rounded-t-3xl">
+                <h2 class="font-black text-xl">🖼️ Referencias Clínicas Visuales</h2>
+                <button onclick="toggleModal('refsModal')" class="text-amber-200 hover:text-white font-bold text-2xl">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Wong Baker -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white border-b pb-2">Escala de Dolor (Wong-Baker FACES)</h3>
+                    <div class="flex justify-between items-center text-center">
+                        <div><div class="text-3xl">😃</div><div class="text-xs font-bold mt-1">0<br>No Hurt</div></div>
+                        <div><div class="text-3xl">🙂</div><div class="text-xs font-bold mt-1">2<br>Hurts little</div></div>
+                        <div><div class="text-3xl">😐</div><div class="text-xs font-bold mt-1">4<br>Hurts more</div></div>
+                        <div><div class="text-3xl">🙁</div><div class="text-xs font-bold mt-1">6<br>Even more</div></div>
+                        <div><div class="text-3xl">😫</div><div class="text-xs font-bold mt-1">8<br>Whole lot</div></div>
+                        <div><div class="text-3xl">😭</div><div class="text-xs font-bold mt-1">10<br>Worst</div></div>
+                    </div>
+                </div>
+                <!-- Lab Values -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white border-b pb-2">Signos Vitales y Laboratorio Común</h3>
+                    <ul class="text-sm space-y-2 text-slate-700 dark:text-slate-300">
+                        <li><strong>Presión Arterial (BP):</strong> Normal < 120/80 mmHg | Alta > 130/80</li>
+                        <li><strong>Ritmo Cardíaco (HR):</strong> Normal 60-100 lpm (bpm)</li>
+                        <li><strong>Saturación Oxígeno (SpO2):</strong> Normal 95% - 100%</li>
+                        <li><strong>Glucosa en ayunas:</strong> Normal < 100 mg/dL | Diabetes > 126 mg/dL</li>
+                        <li><strong>Hemoglobina A1C:</strong> Normal < 5.7% | Diabetes > 6.5%</li>
+                    </ul>
+                </div>
+                <!-- Bristol Scale -->
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 lg:col-span-2">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white border-b pb-2">Escala de Heces de Bristol (Bristol Stool Scale)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs text-slate-700 dark:text-slate-300">
+                        <div class="p-3 border rounded-xl"><strong class="block text-sm mb-1">Tipo 1</strong>Trozos duros separados (estreñimiento severo).</div>
+                        <div class="p-3 border rounded-xl"><strong class="block text-sm mb-1">Tipo 2</strong>Forma de salchicha pero grumosa (estreñimiento leve).</div>
+                        <div class="p-3 border rounded-xl"><strong class="block text-sm mb-1">Tipo 3</strong>Como salchicha con grietas (Normal).</div>
+                        <div class="p-3 border rounded-xl"><strong class="block text-sm mb-1">Tipo 4</strong>Como salchicha o serpiente, suave (Normal óptimo).</div>
+                        <div class="p-3 border rounded-xl"><strong class="block text-sm mb-1">Tipo 5</strong>Trozos de masa suave con bordes definidos (Falta fibra).</div>
+                        <div class="p-3 border rounded-xl"><strong class="block text-sm mb-1">Tipo 6</strong>Pedazos blandos con bordes deshechos (Diarrea leve).</div>
+                        <div class="p-3 border rounded-xl"><strong class="block text-sm mb-1">Tipo 7</strong>Acuosa, sin pedazos sólidos (Diarrea severa).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- MODALES YA EXISTENTES: ATLAS, PROTOCOLOS Y FLASHCARDS -->
+    <div id="atlasModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[50] flex items-center justify-center p-2 sm:p-4">
+        <!-- Contenido del Atlas idéntico a tu última versión -->
         <div class="bg-white dark:bg-slate-900 w-full max-w-6xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col h-[92vh] overflow-hidden">
             <div class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white px-6 py-4 flex justify-between items-center shrink-0">
                 <div>
-                    <h2 class="font-black text-lg md:text-xl flex items-center gap-2">🧍‍♂️ Atlas Anatómico Interactivo Bilingüe</h2>
-                    <p class="text-emerald-100 text-xs">Haz clic directamente sobre las regiones del cuerpo humano</p>
+                    <h2 class="font-black text-lg md:text-xl flex items-center gap-2">🧍‍♂️ Atlas Anatómico Interactivo</h2>
                 </div>
                 <button onclick="toggleModal('atlasModal')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xl flex items-center justify-center transition">&times;</button>
             </div>
-            
             <div class="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
-                <div class="w-full lg:w-5/12 bg-slate-50 dark:bg-slate-950 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col sm:flex-row lg:flex-row items-center gap-4 overflow-y-auto">
+                <div class="w-full lg:w-5/12 bg-slate-50 dark:bg-slate-950 border-b lg:border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col sm:flex-row lg:flex-row items-center gap-4 overflow-y-auto">
+                    <!-- SVG Interactivo -->
                     <div class="w-44 sm:w-48 shrink-0 flex flex-col items-center bg-slate-900 rounded-2xl p-3 border border-slate-800 shadow-inner relative">
                         <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Mapa Corporal</span>
                         <svg viewBox="0 0 200 420" class="w-full h-auto select-none">
@@ -403,36 +561,30 @@
                             </g>
                         </svg>
                     </div>
+                    <!-- Lista de Sistemas -->
                     <div class="flex-1 w-full space-y-1.5">
-                        <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Sistemas del Cuerpo:</p>
-                        <button id="btn-atlas-Nervioso" onclick="loadAtlasSystem('Nervioso')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🧠 Sistema Nervioso</span></button>
-                        <button id="btn-atlas-Sentidos" onclick="loadAtlasSystem('Sentidos')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>👁️ Ojos, Oídos y Garganta</span></button>
-                        <button id="btn-atlas-Respiratorio" onclick="loadAtlasSystem('Respiratorio')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🫁 Sistema Respiratorio</span></button>
-                        <button id="btn-atlas-Cardiovascular" onclick="loadAtlasSystem('Cardiovascular')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🫀 Sist. Cardiovascular</span></button>
-                        <button id="btn-atlas-Digestivo" onclick="loadAtlasSystem('Digestivo')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🥪 Sistema Digestivo</span></button>
-                        <button id="btn-atlas-Urinario" onclick="loadAtlasSystem('Urinario')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>💧 Sist. Urinario y Renal</span></button>
-                        <button id="btn-atlas-Reproductor" onclick="loadAtlasSystem('Reproductor')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🤰 Sistema Reproductor</span></button>
-                        <button id="btn-atlas-Esquelético" onclick="loadAtlasSystem('Esquelético')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🦴 Huesos y Articulaciones</span></button>
+                        <button id="btn-atlas-Nervioso" onclick="loadAtlasSystem('Nervioso')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs">🧠 Sistema Nervioso</button>
+                        <button id="btn-atlas-Sentidos" onclick="loadAtlasSystem('Sentidos')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs">👁️ Ojos, Oídos y Garganta</button>
+                        <button id="btn-atlas-Respiratorio" onclick="loadAtlasSystem('Respiratorio')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs">🫁 Sistema Respiratorio</button>
+                        <button id="btn-atlas-Cardiovascular" onclick="loadAtlasSystem('Cardiovascular')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs">🫀 Sist. Cardiovascular</button>
+                        <button id="btn-atlas-Digestivo" onclick="loadAtlasSystem('Digestivo')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs">🥪 Sistema Digestivo</button>
+                        <button id="btn-atlas-Urinario" onclick="loadAtlasSystem('Urinario')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs">💧 Sist. Urinario y Renal</button>
+                        <button id="btn-atlas-Reproductor" onclick="loadAtlasSystem('Reproductor')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs">🤰 Sistema Reproductor</button>
+                        <button id="btn-atlas-Esquelético" onclick="loadAtlasSystem('Esquelético')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs">🦴 Huesos y Articulaciones</button>
                     </div>
                 </div>
                 <div class="w-full lg:w-7/12 p-5 overflow-y-auto bg-white dark:bg-slate-900 flex flex-col">
-                    <div class="flex flex-wrap justify-between items-center mb-4 border-b border-slate-200 dark:border-slate-800 pb-3 gap-2">
-                        <div>
-                            <h3 id="atlas-title" class="text-xl font-black text-emerald-600 dark:text-emerald-400">Sistema Nervioso</h3>
-                            <p class="text-xs text-slate-500">Haz clic en 🔊 para escuchar o en 🔍 para buscar en el glosario</p>
-                        </div>
-                    </div>
+                    <h3 id="atlas-title" class="text-xl font-black text-emerald-600 dark:text-emerald-400 mb-4 border-b border-emerald-200 dark:border-emerald-800 pb-2">Sistema</h3>
                     <div id="atlas-content" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL PROTOCOLOS Y FLASHCARDS OCULTOS (Igual funcionalidad previa) -->
     <div id="protocolModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[88vh]">
             <div class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white px-6 py-4 flex justify-between items-center">
-                <h2 class="font-black text-lg flex items-center gap-2">📖 Guiones Oficiales <span id="modalAgencyLabel" class="text-xs bg-white/20 px-2.5 py-0.5 rounded-full">Konnect CX</span></h2>
+                <h2 class="font-black text-lg flex items-center gap-2">📖 Guiones Oficiales <span id="modalAgencyLabel" class="text-xs bg-white/20 px-2.5 py-0.5 rounded-full"></span></h2>
                 <button onclick="toggleModal('protocolModal')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xl flex items-center justify-center">&times;</button>
             </div>
             <div class="p-6 space-y-5 bg-slate-50 dark:bg-slate-950 text-sm overflow-y-auto">
@@ -441,10 +593,17 @@
                     <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition shadow-sm mb-2"><p id="script-intro" class="font-bold text-slate-800 dark:text-slate-100 text-base"></p></div>
                     <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition shadow-sm"><p class="font-medium text-slate-700 dark:text-slate-300"><strong class="text-emerald-600 dark:text-emerald-400">ES:</strong> "Buenas, mi nombre es Dykembel y seré su intérprete médico. Por favor, hable en pausas cortas."</p></div>
                 </div>
+                <div>
+                    <h3 class="font-extrabold text-rose-600 dark:text-rose-400 mb-2 uppercase text-xs tracking-wider">Intervenciones Comunes</h3>
+                    <ul class="space-y-2">
+                        <li class="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700"><strong>Repetición:</strong> "The interpreter requests a repetition, please."</li>
+                        <li class="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700"><strong>Aclaración:</strong> "The interpreter requests a brief clarification regarding the term..."</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
-    
+
     <div id="flashcardModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="w-full max-w-xl flex flex-col items-center">
             <div class="w-full flex justify-between items-center mb-4 text-white">
@@ -454,20 +613,20 @@
             <div id="fc-card" class="relative w-full h-72 perspective-1000 cursor-pointer select-none" onclick="flipCard()">
                 <div class="flashcard-inner w-full h-full relative transform-style-3d">
                     <div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border-2 border-blue-500 flex flex-col items-center justify-center p-8 text-center"><span id="fc-cat" class="absolute top-5 text-[11px] font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">Categoría</span><h3 id="fc-front" class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mt-3 leading-snug">Term</h3></div>
-                    <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl shadow-2xl border-2 border-blue-400 flex flex-col items-center justify-center p-8 text-center text-white"><span class="absolute top-5 text-[11px] font-bold uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">Equivalente Español</span><h3 id="fc-back" class="text-2xl md:text-3xl font-black leading-snug">Término</h3></div>
+                    <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl shadow-2xl border-2 border-blue-400 flex flex-col items-center justify-center p-8 text-center text-white"><span class="absolute top-5 text-[11px] font-bold uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">Español</span><h3 id="fc-back" class="text-2xl md:text-3xl font-black leading-snug">Término</h3></div>
                 </div>
             </div>
             <div class="mt-6 flex gap-3 w-full">
-                <button onclick="speakText(document.getElementById('fc-front').innerText)" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold transition flex justify-center items-center gap-2 border border-slate-700">🔊 Pronunciar (EN)</button>
+                <button onclick="speakText(document.getElementById('fc-front').innerText)" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold transition flex justify-center items-center gap-2 border border-slate-700">🔊 Pronunciar</button>
                 <button onclick="nextFlashcard()" class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-extrabold transition shadow-lg shadow-emerald-600/30">Siguiente Tarjeta ➔</button>
             </div>
         </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- LOGICA JAVASCRIPT GLOBAL Y BASE DE DATOS                                  -->
+    <!-- ========================================================================= -->
     <script>
-        // =========================================================================
-        // JAVASCRIPT GLOBAL Y BASE DE DATOS
-        // =========================================================================
         const rawDatabase = `
 [Admisión, Seguros y Legal]
 Do you have any underlying medical conditions?|¿Tiene alguna condición médica subyacente (enfermedad de base)?
@@ -974,8 +1133,33 @@ Desguanzado or Decaído / Weak, fatigued, or lethargic|Desguanzado / Decaído (S
 Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús / Yeyo (Desmayo o malestar súbito)
 `;
 
-        const STORAGE_KEY = 'medicalTermsProSuite_V15'; // Key actualizada
+        const medicalRootsData = [
+            { r: "A-, An-", m: "Sin, falta de", e: "Anemia (sin sangre), Apnea (sin respiración)" },
+            { r: "Anti-", m: "Contra", e: "Antibiotic (contra bacterias)" },
+            { r: "Bi-", m: "Dos, doble", e: "Bilateral (ambos lados)" },
+            { r: "Brady-", m: "Lento", e: "Bradycardia (ritmo cardíaco lento)" },
+            { r: "Tachy-", m: "Rápido", e: "Tachycardia (ritmo cardíaco rápido)" },
+            { r: "Cardio-", m: "Corazón", e: "Cardiomegaly (corazón agrandado)" },
+            { r: "Chole-", m: "Bilis, Vesícula", e: "Cholecystitis (inflamación de vesícula)" },
+            { r: "Dys-", m: "Doloroso, difícil", e: "Dysuria (dolor al orinar), Dyspnea (dificultad para respirar)" },
+            { r: "-ectomy", m: "Extirpación quirúrgica", e: "Appendectomy (extirpar apéndice)" },
+            { r: "Gastro-", m: "Estómago", e: "Gastroenteritis (inflamación de estómago/intestinos)" },
+            { r: "Hema-, Hemo-", m: "Sangre", e: "Hematuria (sangre en orina)" },
+            { r: "Hyper-", m: "Alto, excesivo", e: "Hypertension (presión alta)" },
+            { r: "Hypo-", m: "Bajo, deficiente", e: "Hypoglycemia (azúcar baja)" },
+            { r: "-itis", m: "Inflamación", e: "Arthritis (inflamación de articulaciones)" },
+            { r: "Neuro-", m: "Nervio, cerebro", e: "Neuropathy (enfermedad nerviosa)" },
+            { r: "-ology", m: "Estudio de", e: "Cardiology (estudio del corazón)" },
+            { r: "Osteo-", m: "Hueso", e: "Osteoporosis (hueso poroso)" },
+            { r: "-pathy", m: "Enfermedad", e: "Myopathy (enfermedad muscular)" },
+            { r: "-plasty", m: "Reparación quirúrgica", e: "Rhinoplasty (cirugía de nariz)" },
+            { r: "Pneumo-", m: "Pulmón, aire", e: "Pneumothorax (aire en el tórax)" },
+            { r: "-scopy", m: "Examen visual", e: "Endoscopy (mirar adentro)" }
+        ];
 
+        // LOGICA PRINCIPAL GLOSARIO
+        const STORAGE_KEY = 'medicalTermsProSuite_V15_Master';
+        
         function parseDefaultDB() {
             const lines = rawDatabase.trim().split('\n');
             const parsed = [];
@@ -995,6 +1179,9 @@ Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús 
         let medicalTerms = JSON.parse(localStorage.getItem(STORAGE_KEY)) || parseDefaultDB();
         function normalizeStr(str) { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
 
+        let shiftLogs = JSON.parse(localStorage.getItem('shiftLogs_V1')) || [];
+
+        // TOAST NOTIFICATIONS
         let toastTimeout;
         function showToast(msg) {
             const t = document.getElementById('toast');
@@ -1007,151 +1194,102 @@ Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús 
         function copyText(text) {
             if (!text || text === '...') return;
             navigator.clipboard.writeText(text);
-            showToast('📋 Copiado: ' + (text.length > 40 ? text.slice(0, 40) + '...' : text));
+            showToast('📋 Copiado al portapapeles');
         }
 
-        // =========================================================================
-        // 2. NUEVO MOTOR DE SUBTÍTULOS BILINGÜES EN CASCADA (FLUIDO)
-        // =========================================================================
+        // ==========================================
+        // SUBTÍTULOS EN VIVO (SOLO EN -> ES)
+        // ==========================================
         let recognition = null;
         let isListening = false;
-        let listenLang = 'en-US'; // Default
-        const maxHistoryCards = 12;
-
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = true;
-            recognition.lang = listenLang;
+            recognition.lang = 'en-US'; // Siempre escucha en Inglés
 
             recognition.onresult = (event) => {
                 let interimTranscript = '';
                 let finalSegment = '';
 
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalSegment += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
-                    }
+                    if (event.results[i].isFinal) finalSegment += event.results[i][0].transcript;
+                    else interimTranscript += event.results[i][0].transcript;
                 }
 
-                // Manejo del texto provisorio (interim) - Flotando abajo
                 const interimBox = document.getElementById('liveInterimBox');
-                const interimEl = document.getElementById('liveInterimText');
-                
                 if (interimTranscript.trim().length > 0) {
                     document.getElementById('emptyFeedMsg').classList.add('hidden');
                     interimBox.classList.remove('hidden');
-                    interimEl.innerText = interimTranscript;
+                    document.getElementById('liveInterimText').innerText = interimTranscript;
                     scrollToBottomFeed();
                 } else {
                     interimBox.classList.add('hidden');
                 }
 
-                // Cuando el doctor o paciente termina la frase
-                if (finalSegment.trim().length > 0) {
-                    processFinalSegment(finalSegment.trim());
-                }
+                if (finalSegment.trim().length > 0) processFinalSegment(finalSegment.trim());
             };
 
-            recognition.onend = () => {
-                if (isListening) { try { recognition.start(); } catch (e) {} }
-            };
+            recognition.onend = () => { if (isListening) try { recognition.start(); } catch (e) {} };
         }
 
         function toggleLiveCaptions() {
-            if (!recognition) {
-                alert("Usa Google Chrome, Brave o Microsoft Edge para activar el reconocimiento de voz nativo.");
-                return;
-            }
+            if (!recognition) return alert("Usa Google Chrome/Edge para activar subtítulos en vivo.");
             const btn = document.getElementById('btnStartCaptions');
             const pulse = document.getElementById('micPulse');
 
             if (isListening) {
                 isListening = false;
                 recognition.stop();
-                btn.innerText = '▶ Capturar Audio';
+                btn.innerText = '▶ Iniciar Captura';
                 btn.className = 'px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-lg transition shadow-sm';
                 pulse.className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
                 document.getElementById('liveInterimBox').classList.add('hidden');
-                showToast('⏸ Subtítulos pausados');
             } else {
                 isListening = true;
-                recognition.lang = listenLang;
                 try { recognition.start(); } catch (e) {}
                 btn.innerText = '⏹ Detener';
                 btn.className = 'px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold rounded-lg transition shadow-sm';
                 pulse.className = 'w-2.5 h-2.5 rounded-full bg-red-500 animate-ping';
-                showToast('🎙️ Capturando: ' + (listenLang === 'en-US' ? 'Inglés' : 'Español'));
-            }
-        }
-
-        function toggleLiveLang() {
-            listenLang = listenLang === 'en-US' ? 'es-CR' : 'en-US';
-            const btn = document.getElementById('btnLiveLang');
-            
-            if (listenLang === 'en-US') {
-                btn.innerText = '🇺🇸 EN → ES';
-                btn.className = 'px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold rounded-lg transition shadow-sm';
-                showToast('🇺🇸 Ahora escuchando en Inglés');
-            } else {
-                btn.innerText = '🇪🇸 ES → EN';
-                btn.className = 'px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-bold rounded-lg transition shadow-sm';
-                showToast('🇪🇸 Ahora escuchando en Español');
-            }
-
-            if (isListening && recognition) {
-                recognition.stop();
-                recognition.lang = listenLang;
+                showToast('🎙️ Escuchando Inglés (Traduciendo a Español)');
             }
         }
 
         async function processFinalSegment(text) {
             const msgId = 'seg-' + Date.now();
-            const sourceLang = listenLang;
-            const sl = sourceLang.startsWith('en') ? 'en' : 'es';
-            const tl = sl === 'en' ? 'es' : 'en';
-
+            
             // Buscar en glosario
             const normText = normalizeStr(text);
             const matches = medicalTerms.filter(t => {
                 const cleanEn = normalizeStr(t.en.split('(')[0]).trim();
-                const cleanEs = normalizeStr(t.es.split('(')[0].split('/')[0]).trim();
-                return (cleanEn.length > 4 && normText.includes(cleanEn)) ||
-                       (cleanEs.length > 4 && normText.includes(cleanEs));
+                return (cleanEn.length > 4 && normText.includes(cleanEn));
             }).slice(0, 3);
 
-            // Añadir tarjeta a la interfaz (Cargando traducción)
-            addTranscriptCard(msgId, text, 'Traduciendo...', matches, sl);
+            addTranscriptCard(msgId, text, 'Traduciendo...', matches);
 
-            // Fetch Traducción real
             try {
-                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`;
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=${encodeURIComponent(text)}`;
                 const res = await fetch(url);
                 const data = await res.json();
                 const translatedText = data[0].map(item => item[0]).join('');
-                updateTranscriptCard(msgId, translatedText);
+                document.getElementById(`${msgId}-trans`).innerText = translatedText;
+                document.getElementById(`${msgId}-trans`).classList.remove('animate-pulse');
             } catch (err) {
-                updateTranscriptCard(msgId, '⚠️ Error de traducción de red.');
+                document.getElementById(`${msgId}-trans`).innerText = '⚠️ Error de traducción de red.';
             }
         }
 
-        function addTranscriptCard(id, original, transPlaceholder, matches, sl) {
+        function addTranscriptCard(id, original, transPlaceholder, matches) {
             const feed = document.getElementById('transcriptFeed');
             const interimBox = document.getElementById('liveInterimBox');
-            
-            const flag = sl === 'en' ? '🇺🇸' : '🇪🇸';
-            const colorSrc = sl === 'en' ? 'text-blue-400' : 'text-amber-400';
-            const colorTr = sl === 'en' ? 'text-emerald-400' : 'text-blue-400';
             
             let chipsHtml = '';
             if (matches.length > 0) {
                 chipsHtml = `<div class="mt-2.5 pt-2 border-t border-slate-700/50 flex flex-wrap gap-1.5">
                     <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest flex items-center mr-1">⚡ Detectado:</span>
-                    ${matches.map(m => `<span onclick="copyText('${m.es.replace(/'/g, "\\'")}')" class="cursor-pointer text-[10px] bg-slate-800/80 border border-slate-600 text-slate-300 px-2 py-0.5 rounded flex items-center gap-1 hover:bg-slate-700 transition" title="Copiar"><strong class="${colorSrc}">${sl==='en'?m.en:m.es}</strong> <span class="opacity-50">➔</span> <span class="${colorTr}">${sl==='en'?m.es:m.en}</span></span>`).join('')}
+                    ${matches.map(m => `<span onclick="copyText('${m.es.replace(/'/g, "\\'")}')" class="cursor-pointer text-[10px] bg-slate-800/80 border border-slate-600 text-slate-300 px-2 py-0.5 rounded flex items-center gap-1 hover:bg-slate-700 transition" title="Copiar Traducción"><strong class="text-blue-400">${m.en}</strong> <span class="opacity-50">➔</span> <span class="text-emerald-400">${m.es}</span></span>`).join('')}
                 </div>`;
             }
 
@@ -1159,47 +1297,164 @@ Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús 
                 <div id="${id}" class="bg-slate-900/80 border border-slate-700 p-3.5 rounded-2xl shadow-sm animate-fade-in-up group relative">
                     <button onclick="copyText(document.getElementById('${id}-trans').innerText)" class="absolute top-3 right-3 text-slate-500 hover:text-white opacity-0 group-hover:opacity-100 transition" title="Copiar traducción">📋</button>
                     <div class="flex flex-col gap-1">
-                        <p class="text-sm font-semibold text-slate-200"><span class="mr-1.5 opacity-80">${flag}</span>${original}</p>
-                        <p id="${id}-trans" class="text-sm font-bold ${colorTr} ml-5 animate-pulse">${transPlaceholder}</p>
+                        <p class="text-sm font-semibold text-slate-200"><span class="mr-1.5 opacity-80">🇺🇸</span>${original}</p>
+                        <p id="${id}-trans" class="text-sm font-bold text-emerald-400 ml-5 animate-pulse">${transPlaceholder}</p>
                     </div>
                     ${chipsHtml}
                 </div>
             `;
-
-            // Insertar la tarjeta ANTES de la caja interim
             interimBox.insertAdjacentHTML('beforebegin', cardHtml);
             
-            // Mantener límite de historial
             const cards = feed.querySelectorAll('div[id^="seg-"]');
-            if (cards.length > maxHistoryCards) {
-                cards[0].remove();
-            }
-
+            if (cards.length > 12) cards[0].remove();
             scrollToBottomFeed();
         }
 
-        function updateTranscriptCard(id, translatedText) {
-            const transEl = document.getElementById(`${id}-trans`);
-            if (transEl) {
-                transEl.innerText = translatedText;
-                transEl.classList.remove('animate-pulse');
-            }
-        }
-
-        function scrollToBottomFeed() {
-            const feed = document.getElementById('transcriptFeed');
-            feed.scrollTop = feed.scrollHeight;
-        }
-
+        function scrollToBottomFeed() { const feed = document.getElementById('transcriptFeed'); feed.scrollTop = feed.scrollHeight; }
         function clearCaptionsFeed() {
             const feed = document.getElementById('transcriptFeed');
-            const cards = feed.querySelectorAll('div[id^="seg-"]');
-            cards.forEach(c => c.remove());
+            feed.querySelectorAll('div[id^="seg-"]').forEach(c => c.remove());
             document.getElementById('liveInterimText').innerText = '';
             document.getElementById('liveInterimBox').classList.add('hidden');
             document.getElementById('emptyFeedMsg').classList.remove('hidden');
-            showToast('🗑️ Historial de subtítulos borrado');
+            showToast('🗑️ Subtítulos borrados');
         }
+
+
+        // ==========================================
+        // SHIFT TRACKER Y SCRATCHPAD
+        // ==========================================
+        let timerSecs = 0, timerInt = null;
+        function updateTimer() { document.getElementById('callTimer').innerText = `${String(Math.floor(timerSecs/60)).padStart(2,'0')}:${String(timerSecs%60).padStart(2,'0')}`; }
+        function toggleTimer() {
+            const btn = document.getElementById('timerBtn');
+            if (timerInt) {
+                clearInterval(timerInt); timerInt = null;
+                btn.innerText = '▶'; btn.className = 'text-[10px] px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 rounded text-white font-bold transition';
+            } else {
+                timerInt = setInterval(() => { timerSecs++; updateTimer(); }, 1000);
+                btn.innerText = '⏸'; btn.className = 'text-[10px] px-1.5 py-0.5 bg-amber-600 hover:bg-amber-500 rounded text-white font-bold transition';
+            }
+        }
+        function resetTimer() { if (timerInt) toggleTimer(); timerSecs = 0; updateTimer(); }
+        
+        function saveCallLog() {
+            if(timerSecs === 0) return showToast("El cronómetro está en 0");
+            const d = new Date();
+            const dur = document.getElementById('callTimer').innerText;
+            shiftLogs.push({ date: d.toLocaleDateString(), time: d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), duration: dur });
+            localStorage.setItem('shiftLogs_V1', JSON.stringify(shiftLogs));
+            showToast(`💾 Llamada de ${dur} guardada en reporte`);
+            resetTimer();
+            wipeNotes(); // Limpiar notas automáticamente
+        }
+
+        function renderShiftLog() {
+            const body = document.getElementById('shiftLogBody');
+            if(shiftLogs.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">No hay llamadas registradas hoy. Usa el botón 💾 en el cronómetro para guardar una.</td></tr>';
+                return;
+            }
+            body.innerHTML = shiftLogs.map((log, idx) => `
+                <tr class="hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <td class="p-3 font-semibold">${log.date}</td>
+                    <td class="p-3">${log.time}</td>
+                    <td class="p-3 font-mono text-emerald-600 dark:text-emerald-400 font-bold">${log.duration}</td>
+                    <td class="p-3 text-center"><button onclick="deleteLog(${idx})" class="text-red-500 hover:text-red-700 font-bold">✕</button></td>
+                </tr>
+            `).join('');
+        }
+        function deleteLog(idx) { shiftLogs.splice(idx, 1); localStorage.setItem('shiftLogs_V1', JSON.stringify(shiftLogs)); renderShiftLog(); }
+        function clearShiftLog() { if(confirm("¿Borrar todo el reporte de turnos?")) { shiftLogs = []; localStorage.setItem('shiftLogs_V1', JSON.stringify(shiftLogs)); renderShiftLog(); } }
+        
+        function exportShiftCSV() {
+            let csv = "\uFEFFFecha,Hora Inicio,Duración\n";
+            shiftLogs.forEach(l => csv += `"${l.date}","${l.time}","${l.duration}"\n`);
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+            a.download = 'reporte_turnos_OPI.csv';
+            a.click();
+            showToast('📥 Reporte Exportado');
+        }
+
+        // ==========================================
+        // SIGHT TRANSLATION
+        // ==========================================
+        function processSightText() {
+            const txt = document.getElementById('sightInput').value.trim();
+            if(!txt) return;
+            const output = document.getElementById('sightOutput');
+            output.innerHTML = txt.split(/\s+/).map(word => {
+                const cleanWord = word.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]/g, '');
+                if (cleanWord.length > 3) {
+                    return `<span class="word-hover cursor-pointer font-semibold text-blue-600 dark:text-blue-400" onclick="searchFromSight('${cleanWord}')" title="Buscar: ${cleanWord}">${word}</span>`;
+                }
+                return word;
+            }).join(' ');
+        }
+        function searchFromSight(word) {
+            toggleModal('sightModal');
+            document.getElementById('categoryFilter').value = 'Todas';
+            document.getElementById('searchInput').value = word;
+            filterTerms();
+            showToast('Buscando: ' + word);
+        }
+
+        // ==========================================
+        // RAÍCES MÉDICAS
+        // ==========================================
+        function renderRoots(data) {
+            const tbody = document.getElementById('rootsBody');
+            tbody.innerHTML = data.map(r => `
+                <tr class="hover:bg-slate-100 dark:hover:bg-slate-800">
+                    <td class="p-3 font-bold text-purple-600 dark:text-purple-400">${r.r}</td>
+                    <td class="p-3 font-medium">${r.m}</td>
+                    <td class="p-3 text-slate-500 dark:text-slate-400 italic">${r.e}</td>
+                </tr>
+            `).join('');
+        }
+        function filterRoots() {
+            const q = normalizeStr(document.getElementById('rootsSearch').value);
+            renderRoots(medicalRootsData.filter(r => normalizeStr(r.r + r.m).includes(q)));
+        }
+
+        // Resto del init
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderRoots(medicalRootsData);
+            // El resto de la lógica de atlas, flashcards y temas se mantiene idéntica.
+        });
+
+        // (Re-inyección de funciones Atlas y otros utilitarios que estaban arriba)
+        function toggleAddDrawer() { document.getElementById('addDrawer').classList.toggle('hidden'); }
+
+        const atlasData = {
+            "Nervioso": [{ en: "Brain", es: "Cerebro", q: "Brain" },{ en: "Spinal Cord", es: "Médula espinal", q: "Spinal" },{ en: "Nerve", es: "Nervio", q: "Nerve" },{ en: "Cerebellum", es: "Cerebelo", q: "Neurología" }],
+            "Respiratorio": [{ en: "Lungs", es: "Pulmones", q: "Lung" },{ en: "Trachea", es: "Tráquea", q: "Trachea" },{ en: "Bronchi", es: "Bronquios", q: "Bronch" },{ en: "Diaphragm", es: "Diafragma", q: "Diaphragm" }],
+            "Cardiovascular": [{ en: "Heart", es: "Corazón", q: "Heart" },{ en: "Aorta", es: "Aorta", q: "Aorta" },{ en: "Artery", es: "Arteria", q: "Artery" },{ en: "Vein", es: "Vena", q: "Vein" }],
+            "Digestivo": [{ en: "Stomach", es: "Estómago", q: "Stomach" },{ en: "Liver", es: "Hígado", q: "Liver" },{ en: "Gallbladder", es: "Vesícula", q: "Gallbladder" },{ en: "Colon", es: "Colon", q: "Colon" }],
+            "Urinario": [{ en: "Kidney", es: "Riñón", q: "Kidney" },{ en: "Bladder", es: "Vejiga", q: "Bladder" },{ en: "Urethra", es: "Uretra", q: "Urethra" }],
+            "Reproductor": [{ en: "Uterus", es: "Útero", q: "Uterus" },{ en: "Ovaries", es: "Ovarios", q: "Ovar" },{ en: "Prostate", es: "Próstata", q: "Prostate" }],
+            "Esquelético": [{ en: "Spine", es: "Columna", q: "Spine" },{ en: "Ribs", es: "Costillas", q: "Rib" },{ en: "Femur", es: "Fémur", q: "Femur" },{ en: "Joint", es: "Articulación", q: "Joint" }],
+            "Sentidos": [{ en: "Eye", es: "Ojo", q: "Eye" },{ en: "Ear", es: "Oído", q: "Ear" },{ en: "Throat", es: "Garganta", q: "Throat" }]
+        };
+
+        function openAtlas() { toggleModal('atlasModal'); loadAtlasSystem('Nervioso'); }
+        function loadAtlasSystem(sys) {
+            document.querySelectorAll('.atlas-btn').forEach(btn => btn.classList.remove('active', 'bg-emerald-600', 'text-white'));
+            const activeBtn = document.getElementById('btn-atlas-' + sys);
+            if (activeBtn) activeBtn.classList.add('active', 'bg-emerald-600', 'text-white');
+            document.getElementById('atlas-title').innerText = sys;
+            document.getElementById('atlas-content').innerHTML = atlasData[sys].map(item => `
+                <div class="flex justify-between items-center p-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-emerald-500 transition">
+                    <div><p class="font-bold">${item.en}</p><p class="text-xs text-slate-500">${item.es}</p></div>
+                    <div class="flex gap-1"><button onclick="speakText('${item.en}')" class="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-lg text-emerald-600">🔊</button>
+                    <button onclick="jumpFromAtlas('${item.q}')" class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg text-blue-600">🔍</button></div>
+                </div>
+            `).join('');
+        }
+        function jumpFromAtlas(q) { toggleModal('atlasModal'); document.getElementById('searchInput').value = q; filterTerms(); }
 
     </script>
 </body>
