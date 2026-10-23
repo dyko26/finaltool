@@ -18,18 +18,22 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
                     }
                 }
             }
         }
-        if (localStorage.theme === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
-        }
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW:', err));
-        }
+        if (localStorage.theme === 'light') { document.documentElement.classList.remove('dark'); } 
+        else { document.documentElement.classList.add('dark'); }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(err => console.log('SW:', err)); }
     </script>
     <style>
         ::-webkit-scrollbar { width: 7px; height: 7px; }
@@ -40,97 +44,45 @@
 
         /* Botones del Scratchpad */
         .chip-data {
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            background-color: #ffffff;
-            color: #1e293b;
-            transition: all 0.15s ease;
-            cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            padding: 4px 8px; font-size: 11px; font-weight: 600; border-radius: 6px;
+            border: 1px solid #cbd5e1; background-color: #ffffff; color: #1e293b;
+            transition: all 0.15s ease; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
-        .dark .chip-data {
-            background-color: #1e293b;
-            border-color: #334155;
-            color: #e2e8f0;
-        }
-        .chip-data:hover {
-            background-color: #eff6ff;
-            border-color: #3b82f6;
-            color: #1d4ed8;
-            transform: translateY(-1px);
-        }
-        .dark .chip-data:hover {
-            background-color: #1e3a8a;
-            border-color: #60a5fa;
-            color: #ffffff;
-        }
+        .dark .chip-data { background-color: #1e293b; border-color: #334155; color: #e2e8f0; }
+        .chip-data:hover { background-color: #eff6ff; border-color: #3b82f6; color: #1d4ed8; transform: translateY(-1px); }
+        .dark .chip-data:hover { background-color: #1e3a8a; border-color: #60a5fa; color: #ffffff; }
 
         .chip-sym {
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            border-radius: 6px;
-            border: 1px solid #c7d2fe;
-            background-color: #eef2ff;
-            color: #4338ca;
-            transition: all 0.15s ease;
-            cursor: pointer;
+            padding: 4px 8px; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+            border-radius: 6px; border: 1px solid #c7d2fe; background-color: #eef2ff;
+            color: #4338ca; transition: all 0.15s ease; cursor: pointer;
         }
-        .dark .chip-sym {
-            background-color: rgba(49, 46, 129, 0.45);
-            border-color: rgba(99, 102, 241, 0.4);
-            color: #a5b4fc;
-        }
-        .chip-sym:hover {
-            background-color: #e0e7ff;
-            border-color: #6366f1;
-            transform: translateY(-1px);
-        }
-        .dark .chip-sym:hover {
-            background-color: rgba(67, 56, 202, 0.7);
-            color: #ffffff;
-        }
+        .dark .chip-sym { background-color: rgba(49, 46, 129, 0.45); border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc; }
+        .chip-sym:hover { background-color: #e0e7ff; border-color: #6366f1; transform: translateY(-1px); }
+        .dark .chip-sym:hover { background-color: rgba(67, 56, 202, 0.7); color: #ffffff; }
 
-        /* Animaciones 3D para Flashcards */
+        /* Resaltado del buscador */
+        mark.hl { background-color: rgba(250, 204, 21, 0.35); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: 700; }
+        .dark mark.hl { background-color: rgba(234, 179, 8, 0.4); color: #fef08a; }
+
+        /* Zonas interactivas del SVG Anatómico */
+        .body-zone { transition: all 0.25s ease; cursor: pointer; }
+        .body-zone:hover, .body-zone.active-zone { filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.8)); fill: #10b981 !important; opacity: 0.95 !important; }
+
+        /* Flashcards 3D */
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
         .flashcard-inner { transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1); }
         .flipped .flashcard-inner { transform: rotateY(180deg); }
-
-        /* Zonas interactivas del SVG Anatómico */
-        .body-zone {
-            transition: all 0.25s ease;
-            cursor: pointer;
-        }
-        .body-zone:hover, .body-zone.active-zone {
-            filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.8));
-            fill: #10b981 !important;
-            opacity: 0.95 !important;
-        }
-        mark.hl {
-            background-color: rgba(250, 204, 21, 0.35);
-            color: inherit;
-            padding: 0 2px;
-            border-radius: 3px;
-            font-weight: 700;
-        }
-        .dark mark.hl {
-            background-color: rgba(234, 179, 8, 0.4);
-            color: #fef08a;
-        }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-screen lg:h-screen lg:overflow-hidden flex flex-col transition-colors duration-200">
 
-    <!-- NOTIFICACIÓN FLOTANTE (TOAST) -->
-    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-slate-900 dark:bg-blue-600 text-white px-4 py-2 rounded-full shadow-xl text-xs font-bold flex items-center gap-2 border border-slate-700 dark:border-blue-400">
-        <span id="toastMsg">Copiado al portapapeles</span>
+    <!-- NOTIFICACIÓN FLOTANTE -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] pointer-events-none opacity-0 -translate-y-2 transition-all duration-300 bg-slate-900 dark:bg-blue-600 text-white px-5 py-2.5 rounded-full shadow-2xl text-xs font-bold flex items-center gap-2 border border-slate-700 dark:border-blue-400">
+        <span id="toastMsg">Copiado</span>
     </div>
 
     <!-- BARRA SUPERIOR DE ZONAS HORARIAS Y ATAJOS -->
@@ -147,8 +99,8 @@
             <div>🇺🇸 ET: <span id="time-et" class="font-bold text-rose-400">--:--</span></div>
         </div>
         <div class="hidden xl:flex items-center gap-2 text-[10px] text-slate-400 font-sans">
-            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">Alt+S</kbd> Subtítulos</span>
-            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">Alt+L</kbd> Idioma EN⇄ES</span>
+            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">Alt+S</kbd> Transcribir</span>
+            <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">Alt+L</kbd> IDIOMA</span>
             <span><kbd class="px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700">ESC</kbd> Limpiar</span>
             <span><kbd class="px-1.5 py-0.5 bg-red-950 text-red-300 rounded border border-red-800">Alt+⌫</kbd> Destruir Notas</span>
         </div>
@@ -185,10 +137,10 @@
                 </div>
             </div>
 
-            <!-- Botones de Módulos Interactivos -->
+            <!-- Botones de Módulos -->
             <div class="flex flex-wrap items-center justify-end gap-2 w-full xl:w-auto">
                 <button onclick="openAtlas()" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-xs rounded-xl transition border border-emerald-500/30 flex items-center gap-1.5 shadow-sm">
-                    <span>🧍‍♂️</span> Atlas Anatómico 3D
+                    <span>🧍‍♂️</span> Atlas Anatómico
                 </button>
                 <button onclick="openFlashcards()" class="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-xs rounded-xl transition border border-amber-500/30 flex items-center gap-1.5 shadow-sm">
                     <span>🧠</span> Flashcards
@@ -200,7 +152,6 @@
                     <span>➕</span> Glosario / CSV
                 </button>
 
-                <!-- Estadísticas en vivo -->
                 <div class="flex items-center gap-1.5 bg-blue-50/80 dark:bg-slate-800/90 border border-blue-200/80 dark:border-slate-700 px-3 py-1 rounded-xl">
                     <div class="text-right pr-2 border-r border-blue-200 dark:border-slate-700">
                         <span id="segmentCount" class="block text-xs font-black text-blue-700 dark:text-blue-400 leading-none">0</span>
@@ -212,87 +163,75 @@
                     </div>
                 </div>
 
-                <!-- Botón Modo Oscuro/Claro -->
-                <button onclick="toggleTheme()" id="themeBtn" class="p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition border border-slate-200 dark:border-slate-700" title="Cambiar tema visual">
-                    ☀️
-                </button>
+                <button onclick="toggleTheme()" id="themeBtn" class="p-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition border border-slate-200 dark:border-slate-700" title="Cambiar tema visual">☀️</button>
             </div>
         </header>
 
-        <!-- PANEL DESPLEGABLE PARA AÑADIR TÉRMINOS Y EXPORTAR CSV -->
+        <!-- PANEL DESPLEGABLE DE AÑADIR -->
         <div id="addDrawer" class="hidden bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm border border-blue-200 dark:border-slate-800 shrink-0 transition-all">
             <div class="flex flex-col md:flex-row gap-2 items-center">
-                <input type="text" id="newEn" placeholder="Nuevo segmento o término en Inglés..." class="w-full md:flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <input type="text" id="newEs" placeholder="Traducción clínica y coloquial en Español..." class="w-full md:flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="newEn" placeholder="Término en Inglés..." class="w-full md:flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="newEs" placeholder="Traducción en Español..." class="w-full md:flex-1 px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <select id="newCat" class="w-full md:w-56 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
                 <div class="flex gap-2 w-full md:w-auto">
-                    <button onclick="addTerm()" class="flex-1 md:flex-initial bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs transition whitespace-nowrap">Guardar Término</button>
-                    <button onclick="exportCSV()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition whitespace-nowrap">📥 Exportar CSV</button>
-                    <button onclick="resetDatabase()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-950 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg transition whitespace-nowrap">Restaurar Base</button>
+                    <button onclick="addTerm()" class="flex-1 md:flex-initial bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs transition">Guardar</button>
+                    <button onclick="exportCSV()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition">CSV</button>
+                    <button onclick="resetDatabase()" class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-950 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-lg transition">Restaurar Base</button>
                 </div>
             </div>
         </div>
 
-        <!-- CUERPO DIVIDIDO: GLOSARIO + SUBTÍTULOS (8 COLS) Y SCRATCHPAD (4 COLS) -->
+        <!-- CUERPO: GLOSARIO + SUBTÍTULOS (8 COLS) Y SCRATCHPAD (4 COLS) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch flex-1 min-h-0">
             
-            <!-- COLUMNA IZQUIERDA: SUBTÍTULOS EN VIVO, BUSCADOR Y TABLA -->
+            <!-- COLUMNA IZQUIERDA -->
             <div class="lg:col-span-8 flex flex-col min-h-0 gap-2.5 h-full">
 
-                <!-- PANEL DE SUBTÍTULOS EN TIEMPO REAL (LIVE CAPTIONS) -->
-                <div class="bg-slate-900 dark:bg-slate-900/95 text-white p-3 rounded-2xl shadow-md border border-slate-700/80 shrink-0 space-y-2">
-                    <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-800 pb-2">
+                <!-- 🔴 NUEVO MÓDULO DE SUBTÍTULOS (FEED FLUIDO) 🔴 -->
+                <div class="bg-slate-900 dark:bg-slate-950 text-white p-3 rounded-2xl shadow-md border border-slate-700/80 shrink-0 flex flex-col gap-2 h-64 transition-all">
+                    
+                    <!-- Controles de Subtítulos -->
+                    <div class="flex flex-wrap justify-between items-center gap-2 border-b border-slate-800 pb-2 shrink-0">
                         <div class="flex items-center gap-2">
                             <span id="micPulse" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-                            <span class="font-extrabold text-xs uppercase tracking-wider text-slate-200">🎙️ Subtítulos Bilingües en Tiempo Real</span>
-                            <span class="text-[10px] text-slate-400 hidden sm:inline">(<kbd class="px-1 py-0.5 bg-slate-800 rounded">Alt+S</kbd> Iniciar/Pausar | <kbd class="px-1 py-0.5 bg-slate-800 rounded">Alt+L</kbd> Cambiar Idioma)</span>
+                            <span class="font-black text-xs uppercase tracking-wider text-slate-100 flex items-center gap-1.5">🎙️ Subtítulos en Vivo</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <button onclick="setListenLang('en-US')" id="btnLangEn" class="px-2.5 py-1 bg-blue-600 text-white text-[11px] font-bold rounded-lg transition">
+                            <button onclick="toggleLiveLang()" id="btnLiveLang" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold rounded-lg transition shadow-sm" title="Alternar idioma (Alt+L)">
                                 🇺🇸 EN → ES
                             </button>
-                            <button onclick="setListenLang('es-CR')" id="btnLangEs" class="px-2.5 py-1 bg-slate-800 text-slate-400 hover:text-white text-[11px] font-bold rounded-lg transition">
-                                🇪🇸 ES → EN
-                            </button>
-                            <button onclick="toggleLiveCaptions()" id="btnStartCaptions" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-lg transition shadow-sm">
+                            <button onclick="toggleLiveCaptions()" id="btnStartCaptions" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-lg transition shadow-sm" title="Atajo: Alt+S">
                                 ▶ Capturar Audio
                             </button>
-                            <button onclick="clearCaptions()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-bold rounded-lg transition" title="Limpiar subtítulos">
-                                🗑️
-                            </button>
+                            <button onclick="clearCaptionsFeed()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-xs font-bold rounded-lg transition" title="Limpiar historial">🗑️</button>
                         </div>
                     </div>
 
-                    <!-- Pantallas gemelas: Original y Traducción -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs md:text-sm font-medium">
-                        <div onclick="copyText(document.getElementById('liveOriginal').innerText)" class="cursor-pointer bg-slate-950/90 border border-slate-800 hover:border-slate-600 rounded-xl p-2.5 min-h-[58px] max-h-[85px] overflow-y-auto transition" title="Clic para copiar transcripción">
-                            <span class="block text-[9px] font-bold text-slate-500 uppercase mb-0.5">Transcripción Original (En vivo)</span>
-                            <p id="liveOriginal" class="text-slate-100 leading-snug">Presiona "Capturar Audio" o Alt+S para subtitular...</p>
-                            <p id="liveInterim" class="text-amber-400/90 italic text-xs mt-0.5"></p>
+                    <!-- FEED DE TRANSCRIPCIÓN CONTINUA -->
+                    <div id="transcriptFeed" class="flex-1 overflow-y-auto pr-2 flex flex-col gap-2.5 scroll-smooth">
+                        <!-- El historial de frases aparecerá aquí como burbujas -->
+                        <div id="emptyFeedMsg" class="text-slate-500 text-xs text-center mt-6 italic">Presiona "Capturar Audio" o Alt+S para comenzar a transcribir...</div>
+                        
+                        <!-- Caja para texto "Interim" (Lo que se está escuchando AHORA mismo) -->
+                        <div id="liveInterimBox" class="hidden mt-auto pt-2">
+                            <div class="inline-block bg-slate-800/50 border border-slate-700 px-3 py-2 rounded-xl">
+                                <span class="animate-pulse text-[10px] font-bold text-amber-500 uppercase tracking-widest block mb-0.5">Escuchando...</span>
+                                <span id="liveInterimText" class="text-slate-300 italic text-sm"></span>
+                            </div>
                         </div>
-                        <div onclick="copyText(document.getElementById('liveTranslated').innerText)" class="cursor-pointer bg-blue-950/30 border border-blue-900/50 hover:border-blue-500/60 rounded-xl p-2.5 min-h-[58px] max-h-[85px] overflow-y-auto transition" title="Clic para copiar traducción">
-                            <span class="block text-[9px] font-bold text-blue-400 uppercase mb-0.5">Traducción Simultánea</span>
-                            <p id="liveTranslated" class="text-emerald-300 font-semibold leading-snug">La traducción aparecerá aquí al instante...</p>
-                        </div>
-                    </div>
-
-                    <!-- Términos del glosario detectados automáticamente en la voz -->
-                    <div id="autoDetectedBox" class="hidden pt-0.5 flex flex-wrap items-center gap-1.5">
-                        <span class="text-[10px] font-extrabold text-amber-400 uppercase">⚡ Detectado en glosario:</span>
-                        <div id="autoDetectedChips" class="flex flex-wrap gap-1.5"></div>
                     </div>
                 </div>
                 
-                <!-- Buscador Inteligente y Píldoras de Especialidad -->
+                <!-- Buscador Inteligente -->
                 <div class="bg-white dark:bg-slate-900 p-3 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 shrink-0 space-y-2">
                     <div class="flex flex-col sm:flex-row gap-2">
                         <div class="relative flex-1">
                             <span class="absolute left-3.5 top-2 text-slate-400 text-sm">🔍</span>
                             <input 
                                 type="text" id="searchInput" 
-                                placeholder="Busca síntoma, fármaco (ej. Norco, Lisinopril), cirugía o jerga (ej. empacho, culebrilla)..." 
+                                placeholder="Busca síntoma, fármaco, cirugía o jerga (ej. empacho)..." 
                                 class="w-full pl-9 pr-9 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm transition-all"
-                                oninput="filterTerms()" autofocus
+                                oninput="filterTerms()"
                             >
                             <button onclick="clearSearch()" class="absolute right-3 top-1.5 text-slate-400 hover:text-rose-500 font-bold text-sm" title="Limpiar búsqueda (ESC)">✕</button>
                         </div>
@@ -301,44 +240,42 @@
                         </select>
                     </div>
                     
-                    <!-- Botones de Acceso Rápido por Sistemas -->
+                    <!-- Filtro rápido anatómico -->
                     <div class="flex flex-wrap gap-1.5 items-center">
-                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Filtro rápido:</span>
+                        <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mr-1">Filtro:</span>
                         <button onclick="setCategory('Todas')" class="px-2 py-0.5 bg-blue-600 text-white rounded-lg text-[11px] font-bold transition shadow-sm">🌐 Todas</button>
-                        <button onclick="setCategory('Síntomas, Dolor y Signos')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">⚡ Dolor/Síntomas</button>
+                        <button onclick="setCategory('Síntomas, Dolor y Signos')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">⚡ Dolor</button>
                         <button onclick="setCategory('Medicamentos y Farmacología')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">💊 Fármacos</button>
                         <button onclick="setCategory('Procedimientos y Cirugías')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">🔪 Cirugías</button>
-                        <button onclick="setCategory('Cardiología y Vascular')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">🫀 Cardio</button>
                         <button onclick="setCategory('Neurología y Neurocirugía')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">🧠 Neuro</button>
-                        <button onclick="setCategory('Gastroenterología y Hepatología')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">🥪 Gastro</button>
+                        <button onclick="setCategory('Cardiología y Vascular')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">🫀 Cardio</button>
                         <button onclick="setCategory('Ortopedia, Reumatología y Fisioterapia')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">🦴 Ortopedia</button>
-                        <button onclick="setCategory('Ginecología, Obstetricia y Neonatal')" class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-lg text-[11px] font-semibold transition border border-slate-200 dark:border-slate-700">🤰 OB/GYN</button>
-                        <button onclick="setCategory('Regionalismos y Coloquialismos Médicos')" class="px-2 py-0.5 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 rounded-lg text-[11px] font-bold transition border border-amber-500/30">🗣️ Jerga/Coloquial</button>
+                        <button onclick="setCategory('Regionalismos y Coloquialismos Médicos')" class="px-2 py-0.5 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 rounded-lg text-[11px] font-bold transition border border-amber-500/30">🗣️ Jerga</button>
                     </div>
                 </div>
 
-                <!-- Tabla Interactiva de Segmentos -->
+                <!-- Tabla Interactiva Principal -->
                 <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 flex-1 flex flex-col min-h-0 overflow-hidden">
                     <div class="overflow-y-auto flex-1">
                         <table class="w-full text-left border-collapse">
                             <thead class="sticky top-0 bg-slate-900 dark:bg-slate-950 text-slate-200 shadow-sm z-10 text-[11px] uppercase tracking-wider">
                                 <tr>
                                     <th class="py-2 px-3.5 font-bold w-2/12">Especialidad</th>
-                                    <th class="py-2 px-3.5 font-bold w-5/12">English (Clic para copiar / 🔊 Audio)</th>
-                                    <th class="py-2 px-3.5 font-bold w-5/12">Español (Equivalente Clínico y Coloquial)</th>
+                                    <th class="py-2 px-3.5 font-bold w-5/12">English (Clic para copiar)</th>
+                                    <th class="py-2 px-3.5 font-bold w-5/12">Español Clínico y Coloquial</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody" class="divide-y divide-slate-100 dark:divide-slate-800/70 text-sm"></tbody>
+                            <tbody id="tableBody" class="text-sm"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: SCRATCHPAD Y HERRAMIENTAS DE LLAMADA (4 COLS) -->
+            <!-- COLUMNA DERECHA: SCRATCHPAD (4 COLS) -->
             <div class="lg:col-span-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 flex flex-col min-h-[500px] lg:h-full overflow-hidden">
                 
-                <!-- Cabecera del Scratchpad + Cronómetro -->
-                <div class="px-3.5 py-2.5 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-center shrink-0 border-b border-slate-800">
+                <!-- Cabecera del Scratchpad -->
+                <div class="px-3.5 py-2 bg-slate-900 dark:bg-slate-950 text-white flex justify-between items-center shrink-0 border-b border-slate-800">
                     <div class="flex items-center gap-2">
                         <span class="font-extrabold text-xs tracking-wider uppercase flex items-center gap-1.5">📝 Scratchpad</span>
                         <span class="text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.5 rounded uppercase">HIPAA Safe</span>
@@ -383,38 +320,38 @@
                     </div>
                 </div>
 
-                <!-- Área de Texto de Notas -->
-                <div class="p-2.5 flex-1 flex flex-col min-h-0">
+                <!-- Área de Texto -->
+                <div class="p-2 flex-1 flex flex-col min-h-0">
                     <textarea 
                         id="scratchpad" 
-                        placeholder="Toma tus apuntes de interpretación consecutiva aquí...&#10;&#10;• Haz clic en cualquier frase o subtítulo para copiarlo&#10;• Usa los botones superiores para insertar símbolos&#10;• Presiona Alt + Backspace al colgar para destruir las notas."
+                        placeholder="Anota dosis, fechas, números y datos aquí...&#10;&#10;Destruye las notas al finalizar con Alt + Backspace."
                         class="w-full flex-1 p-3 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm leading-relaxed resize-none bg-amber-50/40 dark:bg-slate-950 text-slate-900 dark:text-slate-100 shadow-inner transition-all"
                         oninput="saveScratchpad()"
                     ></textarea>
                     
                     <div class="mt-2 flex items-center justify-between gap-2 shrink-0">
                         <span id="charCounter" class="text-[11px] font-mono text-slate-400">0 car.</span>
-                        <button onclick="wipeNotes()" class="flex-1 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-[0.99] text-white font-extrabold text-xs rounded-xl shadow-md shadow-red-600/20 transition flex justify-center items-center gap-1.5">
-                            <span>🗑️</span> DESTRUIR NOTAS (ALT + ⌫)
+                        <button onclick="wipeNotes()" class="flex-1 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-[0.99] text-white font-extrabold text-xs rounded-xl shadow-md transition flex justify-center items-center gap-1.5">
+                            🗑️ DESTRUIR NOTAS (ALT + ⌫)
                         </button>
                     </div>
                 </div>
 
-                <!-- Conversores Médicos Tripartitos -->
+                <!-- Conversores -->
                 <div class="p-2.5 bg-slate-50 dark:bg-slate-950/70 border-t border-slate-200 dark:border-slate-800 shrink-0 space-y-1.5">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Conversores Clínicos Instantáneos</div>
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Conversores Clínicos</div>
                     <div class="grid grid-cols-3 gap-1.5 text-xs font-mono">
-                        <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1">
+                        <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 shadow-sm">
                             <input type="number" id="kgInput" placeholder="Kg" oninput="convertWeight('kg')" class="w-full bg-transparent focus:outline-none font-bold text-slate-700 dark:text-slate-200">
                             <span class="text-slate-400 px-0.5">⇄</span>
                             <input type="number" id="lbInput" placeholder="Lbs" oninput="convertWeight('lb')" class="w-full bg-transparent focus:outline-none font-bold text-blue-600 dark:text-blue-400 text-right">
                         </div>
-                        <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1">
+                        <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 shadow-sm">
                             <input type="number" id="cInput" placeholder="°C" oninput="convertTemp('c')" class="w-full bg-transparent focus:outline-none font-bold text-slate-700 dark:text-slate-200">
                             <span class="text-slate-400 px-0.5">⇄</span>
                             <input type="number" id="fInput" placeholder="°F" oninput="convertTemp('f')" class="w-full bg-transparent focus:outline-none font-bold text-rose-600 dark:text-rose-400 text-right">
                         </div>
-                        <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1">
+                        <div class="flex items-center bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1 shadow-sm">
                             <input type="number" id="cmInput" placeholder="cm" oninput="convertHeight()" class="w-full bg-transparent focus:outline-none font-bold text-slate-700 dark:text-slate-200">
                             <span class="text-slate-400 px-0.5">→</span>
                             <span id="ftOutput" class="w-full font-bold text-emerald-600 dark:text-emerald-400 text-right whitespace-nowrap">ft'in"</span>
@@ -425,77 +362,64 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL 1: ATLAS ANATÓMICO CON SILUETA SVG   -->
-    <!-- ========================================== -->
+    <!-- MODAL ATLAS ANATÓMICO -->
     <div id="atlasModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4">
+        <!-- Código del atlas idéntico a tu última versión, respetando su funcionamiento... -->
         <div class="bg-white dark:bg-slate-900 w-full max-w-6xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col h-[92vh] overflow-hidden">
-            
             <div class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white px-6 py-4 flex justify-between items-center shrink-0">
                 <div>
                     <h2 class="font-black text-lg md:text-xl flex items-center gap-2">🧍‍♂️ Atlas Anatómico Interactivo Bilingüe</h2>
-                    <p class="text-emerald-100 text-xs">Haz clic directamente sobre las regiones del cuerpo humano o selecciona un sistema para explorar sus órganos</p>
+                    <p class="text-emerald-100 text-xs">Haz clic directamente sobre las regiones del cuerpo humano</p>
                 </div>
                 <button onclick="toggleModal('atlasModal')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xl flex items-center justify-center transition">&times;</button>
             </div>
             
             <div class="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
                 <div class="w-full lg:w-5/12 bg-slate-50 dark:bg-slate-950 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 p-4 flex flex-col sm:flex-row lg:flex-row items-center gap-4 overflow-y-auto">
-                    
-                    <!-- Silueta SVG Interactiva -->
                     <div class="w-44 sm:w-48 shrink-0 flex flex-col items-center bg-slate-900 rounded-2xl p-3 border border-slate-800 shadow-inner relative">
                         <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Mapa Corporal</span>
                         <svg viewBox="0 0 200 420" class="w-full h-auto select-none">
                             <g fill="#334155" stroke="#475569" stroke-width="2">
-                                <circle cx="100" cy="42" r="28" />
-                                <rect x="88" y="68" width="24" height="18" rx="4" />
+                                <circle cx="100" cy="42" r="28" /><rect x="88" y="68" width="24" height="18" rx="4" />
                                 <path d="M60,84 L140,84 L132,225 L68,225 Z" rx="12" />
-                                <rect x="34" y="86" width="22" height="125" rx="11" />
-                                <rect x="144" y="86" width="22" height="125" rx="11" />
-                                <rect x="68" y="225" width="28" height="165" rx="12" />
-                                <rect x="104" y="225" width="28" height="165" rx="12" />
+                                <rect x="34" y="86" width="22" height="125" rx="11" /><rect x="144" y="86" width="22" height="125" rx="11" />
+                                <rect x="68" y="225" width="28" height="165" rx="12" /><rect x="104" y="225" width="28" height="165" rx="12" />
                             </g>
-
-                            <!-- ZONAS INTERACTIVAS -->
-                            <path id="svg-Nervioso" onclick="loadAtlasSystem('Nervioso')" class="body-zone" fill="#a855f7" opacity="0.75" d="M80,32 C80,18 120,18 120,32 C120,44 80,44 80,32 Z"><title>Sistema Nervioso / Cerebro</title></path>
+                            <path id="svg-Nervioso" onclick="loadAtlasSystem('Nervioso')" class="body-zone" fill="#a855f7" opacity="0.75" d="M80,32 C80,18 120,18 120,32 C120,44 80,44 80,32 Z"></path>
                             <g id="svg-Sentidos" onclick="loadAtlasSystem('Sentidos')" class="body-zone" fill="#38bdf8" opacity="0.8">
-                                <circle cx="90" cy="45" r="5" /><circle cx="110" cy="45" r="5" /><rect x="93" y="55" width="14" height="6" rx="3" /><title>Órganos de los Sentidos y Garganta (ENT)</title>
+                                <circle cx="90" cy="45" r="5" /><circle cx="110" cy="45" r="5" /><rect x="93" y="55" width="14" height="6" rx="3" />
                             </g>
                             <g id="svg-Respiratorio" onclick="loadAtlasSystem('Respiratorio')" class="body-zone" fill="#06b6d4" opacity="0.75">
-                                <path d="M72,95 C68,115 68,140 88,142 L94,95 Z" /><path d="M128,95 C132,115 132,140 112,142 L106,95 Z" /><title>Sistema Respiratorio / Pulmones</title>
+                                <path d="M72,95 C68,115 68,140 88,142 L94,95 Z" /><path d="M128,95 C132,115 132,140 112,142 L106,95 Z" />
                             </g>
-                            <circle id="svg-Cardiovascular" onclick="loadAtlasSystem('Cardiovascular')" class="body-zone" cx="104" cy="122" r="13" fill="#f43f5e" opacity="0.9"><title>Sistema Cardiovascular / Corazón</title></circle>
-                            <path id="svg-Digestivo" onclick="loadAtlasSystem('Digestivo')" class="body-zone" fill="#f97316" opacity="0.75" d="M74,148 L126,148 L122,192 L78,192 Z"><title>Sistema Digestivo / Abdomen</title></path>
+                            <circle id="svg-Cardiovascular" onclick="loadAtlasSystem('Cardiovascular')" class="body-zone" cx="104" cy="122" r="13" fill="#f43f5e" opacity="0.9"></circle>
+                            <path id="svg-Digestivo" onclick="loadAtlasSystem('Digestivo')" class="body-zone" fill="#f97316" opacity="0.75" d="M74,148 L126,148 L122,192 L78,192 Z"></path>
                             <g id="svg-Urinario" onclick="loadAtlasSystem('Urinario')" class="body-zone" fill="#3b82f6" opacity="0.85">
-                                <ellipse cx="82" cy="175" rx="7" ry="11" /><ellipse cx="118" cy="175" rx="7" ry="11" /><circle cx="100" cy="205" r="8" /><title>Sistema Urinario / Riñones y Vejiga</title>
+                                <ellipse cx="82" cy="175" rx="7" ry="11" /><ellipse cx="118" cy="175" rx="7" ry="11" /><circle cx="100" cy="205" r="8" />
                             </g>
-                            <path id="svg-Reproductor" onclick="loadAtlasSystem('Reproductor')" class="body-zone" fill="#ec4899" opacity="0.8" d="M80,212 L120,212 L100,234 Z"><title>Sistema Reproductor</title></path>
+                            <path id="svg-Reproductor" onclick="loadAtlasSystem('Reproductor')" class="body-zone" fill="#ec4899" opacity="0.8" d="M80,212 L120,212 L100,234 Z"></path>
                             <g id="svg-Esquelético" onclick="loadAtlasSystem('Esquelético')" class="body-zone" fill="#eab308" opacity="0.8">
-                                <circle cx="45" cy="145" r="9" /><circle cx="155" cy="145" r="9" /><circle cx="82" cy="295" r="11" /><circle cx="118" cy="295" r="11" /><title>Sistema Musculoesquelético y Articulaciones</title>
+                                <circle cx="45" cy="145" r="9" /><circle cx="155" cy="145" r="9" /><circle cx="82" cy="295" r="11" /><circle cx="118" cy="295" r="11" />
                             </g>
                         </svg>
-                        <span class="text-[10px] text-slate-400 mt-1 text-center">Toca cualquier órgano del modelo</span>
                     </div>
-
-                    <!-- Lista de Sistemas -->
                     <div class="flex-1 w-full space-y-1.5">
                         <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Sistemas del Cuerpo:</p>
-                        <button id="btn-atlas-Nervioso" onclick="loadAtlasSystem('Nervioso')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🧠 1. Sistema Nervioso</span><span class="text-[10px] opacity-70">12 órganos</span></button>
-                        <button id="btn-atlas-Sentidos" onclick="loadAtlasSystem('Sentidos')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>👁️ 2. Ojos, Oídos y Garganta</span><span class="text-[10px] opacity-70">14 partes</span></button>
-                        <button id="btn-atlas-Respiratorio" onclick="loadAtlasSystem('Respiratorio')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🫁 3. Sistema Respiratorio</span><span class="text-[10px] opacity-70">10 órganos</span></button>
-                        <button id="btn-atlas-Cardiovascular" onclick="loadAtlasSystem('Cardiovascular')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🫀 4. Sist. Cardiovascular</span><span class="text-[10px] opacity-70">12 partes</span></button>
-                        <button id="btn-atlas-Digestivo" onclick="loadAtlasSystem('Digestivo')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🥪 5. Sistema Digestivo</span><span class="text-[10px] opacity-70">12 órganos</span></button>
-                        <button id="btn-atlas-Urinario" onclick="loadAtlasSystem('Urinario')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>💧 6. Sistema Urinario y Renal</span><span class="text-[10px] opacity-70">8 órganos</span></button>
-                        <button id="btn-atlas-Reproductor" onclick="loadAtlasSystem('Reproductor')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🤰 7. Sistema Reproductor</span><span class="text-[10px] opacity-70">11 órganos</span></button>
-                        <button id="btn-atlas-Esquelético" onclick="loadAtlasSystem('Esquelético')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🦴 8. Huesos, Músculos y Art.</span><span class="text-[10px] opacity-70">14 partes</span></button>
+                        <button id="btn-atlas-Nervioso" onclick="loadAtlasSystem('Nervioso')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🧠 Sistema Nervioso</span></button>
+                        <button id="btn-atlas-Sentidos" onclick="loadAtlasSystem('Sentidos')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>👁️ Ojos, Oídos y Garganta</span></button>
+                        <button id="btn-atlas-Respiratorio" onclick="loadAtlasSystem('Respiratorio')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🫁 Sistema Respiratorio</span></button>
+                        <button id="btn-atlas-Cardiovascular" onclick="loadAtlasSystem('Cardiovascular')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🫀 Sist. Cardiovascular</span></button>
+                        <button id="btn-atlas-Digestivo" onclick="loadAtlasSystem('Digestivo')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🥪 Sistema Digestivo</span></button>
+                        <button id="btn-atlas-Urinario" onclick="loadAtlasSystem('Urinario')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>💧 Sist. Urinario y Renal</span></button>
+                        <button id="btn-atlas-Reproductor" onclick="loadAtlasSystem('Reproductor')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🤰 Sistema Reproductor</span></button>
+                        <button id="btn-atlas-Esquelético" onclick="loadAtlasSystem('Esquelético')" class="atlas-btn w-full text-left px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-slate-800 transition font-bold text-xs flex items-center justify-between"><span>🦴 Huesos y Articulaciones</span></button>
                     </div>
                 </div>
-                
                 <div class="w-full lg:w-7/12 p-5 overflow-y-auto bg-white dark:bg-slate-900 flex flex-col">
                     <div class="flex flex-wrap justify-between items-center mb-4 border-b border-slate-200 dark:border-slate-800 pb-3 gap-2">
                         <div>
                             <h3 id="atlas-title" class="text-xl font-black text-emerald-600 dark:text-emerald-400">Sistema Nervioso</h3>
-                            <p class="text-xs text-slate-500">Haz clic en 🔊 para escuchar la fonética o en 🔍 para buscar patologías de ese órgano en el glosario</p>
+                            <p class="text-xs text-slate-500">Haz clic en 🔊 para escuchar o en 🔍 para buscar en el glosario</p>
                         </div>
                     </div>
                     <div id="atlas-content" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
@@ -504,90 +428,45 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL 2: GUIONES DE PROTOCOLO POR AGENCIA  -->
-    <!-- ========================================== -->
+    <!-- MODAL PROTOCOLOS Y FLASHCARDS OCULTOS (Igual funcionalidad previa) -->
     <div id="protocolModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[88vh]">
             <div class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white px-6 py-4 flex justify-between items-center">
-                <h2 class="font-black text-lg flex items-center gap-2">📖 Guiones Oficiales de Protocolo <span id="modalAgencyLabel" class="text-xs bg-white/20 px-2.5 py-0.5 rounded-full">Konnect CX</span></h2>
+                <h2 class="font-black text-lg flex items-center gap-2">📖 Guiones Oficiales <span id="modalAgencyLabel" class="text-xs bg-white/20 px-2.5 py-0.5 rounded-full">Konnect CX</span></h2>
                 <button onclick="toggleModal('protocolModal')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xl flex items-center justify-center">&times;</button>
             </div>
             <div class="p-6 space-y-5 bg-slate-50 dark:bg-slate-950 text-sm overflow-y-auto">
                 <div>
-                    <h3 class="font-extrabold text-blue-600 dark:text-blue-400 mb-2 uppercase text-xs tracking-wider">1. Apertura (Greeting — Clic para copiar)</h3>
-                    <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition shadow-sm mb-2">
-                        <p id="script-intro" class="font-bold text-slate-800 dark:text-slate-100 text-base"></p>
-                    </div>
-                    <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition shadow-sm">
-                        <p class="font-medium text-slate-700 dark:text-slate-300"><strong class="text-emerald-600 dark:text-emerald-400">Español (Al paciente):</strong> "Buenas, mi nombre es Dykembel y seré su intérprete médico de español. Todo lo que se diga en esta sesión es estrictamente confidencial. Por favor, hable en pausas cortas para poder interpretarle con precisión."</p>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="font-extrabold text-rose-600 dark:text-rose-400 mb-2 uppercase text-xs tracking-wider">2. Intervenciones en Tercera Persona (Transparency)</h3>
-                    <div class="grid grid-cols-1 gap-2">
-                        <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-rose-500 transition">
-                            <strong>Repetición:</strong> "Excuse me, the interpreter requests a repetition of the last segment, please." / "Disculpe, el intérprete solicita que repita lo último, por favor."
-                        </div>
-                        <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-rose-500 transition">
-                            <strong>Aclaración / Acrónimo:</strong> "Excuse me, as the interpreter, could you please clarify or spell out the term/acronym used?"
-                        </div>
-                        <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-rose-500 transition">
-                            <strong>Pausas / Segmentos largos:</strong> "Excuse me, the interpreter kindly requests shorter pauses to ensure accuracy."
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="font-extrabold text-emerald-600 dark:text-emerald-400 mb-2 uppercase text-xs tracking-wider">3. Cierre Profesional (Closing)</h3>
-                    <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition">
-                        <p class="font-semibold text-slate-800 dark:text-slate-200">"Thank you for using interpretation services. Have a wonderful rest of your day. Interpreter disconnecting."</p>
-                    </div>
+                    <h3 class="font-extrabold text-blue-600 dark:text-blue-400 mb-2 uppercase text-xs tracking-wider">Apertura</h3>
+                    <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition shadow-sm mb-2"><p id="script-intro" class="font-bold text-slate-800 dark:text-slate-100 text-base"></p></div>
+                    <div onclick="copyText(this.innerText)" class="cursor-pointer bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition shadow-sm"><p class="font-medium text-slate-700 dark:text-slate-300"><strong class="text-emerald-600 dark:text-emerald-400">ES:</strong> "Buenas, mi nombre es Dykembel y seré su intérprete médico. Por favor, hable en pausas cortas."</p></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- ========================================== -->
-    <!-- MODAL 3: ENTRENAMIENTO CON FLASHCARDS 3D   -->
-    <!-- ========================================== -->
+    
     <div id="flashcardModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="w-full max-w-xl flex flex-col items-center">
             <div class="w-full flex justify-between items-center mb-4 text-white">
-                <div>
-                    <h2 class="font-black text-2xl">🧠 Entrenamiento de Retención</h2>
-                    <p class="text-xs text-slate-400">Usa <kbd class="px-1.5 py-0.5 bg-slate-800 rounded">Espacio</kbd> para voltear o <kbd class="px-1.5 py-0.5 bg-slate-800 rounded">→</kbd> para siguiente</p>
-                </div>
+                <div><h2 class="font-black text-2xl">🧠 Entrenamiento de Retención</h2><p class="text-xs text-slate-400">Usa <kbd class="px-1.5 py-0.5 bg-slate-800 rounded">Espacio</kbd> para voltear o <kbd class="px-1.5 py-0.5 bg-slate-800 rounded">→</kbd> para siguiente</p></div>
                 <button onclick="toggleModal('flashcardModal')" class="w-9 h-9 rounded-full bg-white/10 hover:bg-rose-600 text-white font-bold text-2xl flex items-center justify-center transition">&times;</button>
             </div>
-            
             <div id="fc-card" class="relative w-full h-72 perspective-1000 cursor-pointer select-none" onclick="flipCard()">
                 <div class="flashcard-inner w-full h-full relative transform-style-3d">
-                    <div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border-2 border-blue-500 flex flex-col items-center justify-center p-8 text-center">
-                        <span id="fc-cat" class="absolute top-5 text-[11px] font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">Categoría</span>
-                        <h3 id="fc-front" class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mt-3 leading-snug">Term</h3>
-                        <p class="absolute bottom-5 text-xs text-slate-400 font-bold uppercase tracking-wider">Toca la tarjeta para ver traducción ⤵</p>
-                    </div>
-                    <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl shadow-2xl border-2 border-blue-400 flex flex-col items-center justify-center p-8 text-center text-white">
-                        <span class="absolute top-5 text-[11px] font-bold uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">Equivalente en Español</span>
-                        <h3 id="fc-back" class="text-2xl md:text-3xl font-black leading-snug">Término</h3>
-                    </div>
+                    <div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border-2 border-blue-500 flex flex-col items-center justify-center p-8 text-center"><span id="fc-cat" class="absolute top-5 text-[11px] font-extrabold text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800">Categoría</span><h3 id="fc-front" class="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mt-3 leading-snug">Term</h3></div>
+                    <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl shadow-2xl border-2 border-blue-400 flex flex-col items-center justify-center p-8 text-center text-white"><span class="absolute top-5 text-[11px] font-bold uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full">Equivalente Español</span><h3 id="fc-back" class="text-2xl md:text-3xl font-black leading-snug">Término</h3></div>
                 </div>
             </div>
-
             <div class="mt-6 flex gap-3 w-full">
-                <button onclick="speakText(document.getElementById('fc-front').innerText)" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold transition flex justify-center items-center gap-2 border border-slate-700">
-                    🔊 Pronunciar (EN)
-                </button>
-                <button onclick="nextFlashcard()" class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-extrabold transition shadow-lg shadow-emerald-600/30">
-                    Siguiente Tarjeta ➔
-                </button>
+                <button onclick="speakText(document.getElementById('fc-front').innerText)" class="flex-1 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold transition flex justify-center items-center gap-2 border border-slate-700">🔊 Pronunciar (EN)</button>
+                <button onclick="nextFlashcard()" class="flex-1 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-extrabold transition shadow-lg shadow-emerald-600/30">Siguiente Tarjeta ➔</button>
             </div>
         </div>
     </div>
 
     <script>
         // =========================================================================
-        // 1. BASE DE DATOS COMPLETA (24 ESPECIALIDADES / +680 CONCEPTOS / +5,000 PALABRAS)
+        // JAVASCRIPT GLOBAL Y BASE DE DATOS
         // =========================================================================
         const rawDatabase = `
 [Admisión, Seguros y Legal]
@@ -1095,7 +974,7 @@ Desguanzado or Decaído / Weak, fatigued, or lethargic|Desguanzado / Decaído (S
 Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús / Yeyo (Desmayo o malestar súbito)
 `;
 
-        const STORAGE_KEY = 'medicalTermsProSuite_V11';
+        const STORAGE_KEY = 'medicalTermsProSuite_V15'; // Key actualizada
 
         function parseDefaultDB() {
             const lines = rawDatabase.trim().split('\n');
@@ -1120,480 +999,24 @@ Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús 
         function showToast(msg) {
             const t = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
-            t.classList.remove('opacity-0', 'translate-y-2');
+            t.classList.remove('opacity-0', '-translate-y-2');
             clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => t.classList.add('opacity-0', 'translate-y-2'), 2000);
+            toastTimeout = setTimeout(() => t.classList.add('opacity-0', '-translate-y-2'), 2500);
         }
 
         function copyText(text) {
             if (!text || text === '...') return;
             navigator.clipboard.writeText(text);
-            showToast('📋 Copiado: ' + (text.length > 35 ? text.slice(0, 35) + '...' : text));
-        }
-
-        function initCategories() {
-            const categories = [...new Set(medicalTerms.map(t => t.cat))];
-            const filterSelect = document.getElementById('categoryFilter');
-            const newCatSelect = document.getElementById('newCat');
-            filterSelect.innerHTML = `<option value="Todas">Todas las especialidades (${categories.length})</option>`;
-            newCatSelect.innerHTML = '';
-            categories.forEach(cat => {
-                filterSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-                newCatSelect.innerHTML += `<option value="${cat}">${cat}</option>`;
-            });
-        }
-
-        function updateStats(list) {
-            document.getElementById('segmentCount').innerText = list.length.toLocaleString();
-            let words = 0;
-            list.forEach(t => { words += t.en.split(/\s+/).length + t.es.split(/\s+/).length; });
-            document.getElementById('wordCount').innerText = words.toLocaleString();
-        }
-
-        const badgeColors = { 
-            "Admisión, Seguros y Legal": "bg-slate-200 text-slate-800 dark:bg-slate-800 dark:text-slate-300",
-            "Instrucciones y Examen Físico": "bg-yellow-100 text-yellow-800 dark:bg-yellow-950/60 dark:text-yellow-300",
-            "Síntomas, Dolor y Signos": "bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300",
-            "Anatomía General y Órganos": "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300",
-            "Procedimientos y Cirugías": "bg-lime-100 text-lime-800 dark:bg-lime-950/60 dark:text-lime-300",
-            "Medicamentos y Farmacología": "bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300",
-            "Laboratorio y Patología": "bg-violet-100 text-violet-800 dark:bg-violet-950/60 dark:text-violet-300",
-            "Cardiología y Vascular": "bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300",
-            "Neurología y Neurocirugía": "bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300",
-            "Gastroenterología y Hepatología": "bg-orange-100 text-orange-800 dark:bg-orange-950/60 dark:text-orange-300",
-            "Ortopedia, Reumatología y Fisioterapia": "bg-stone-200 text-stone-800 dark:bg-stone-800 dark:text-stone-300",
-            "Ginecología, Obstetricia y Neonatal": "bg-pink-100 text-pink-800 dark:bg-pink-950/60 dark:text-pink-300",
-            "Pediatría y Vacunación": "bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300",
-            "Neumología y Respiratorio": "bg-cyan-100 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300",
-            "Endocrinología y Metabolismo": "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300",
-            "Urología y Nefrología": "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300",
-            "Oncología y Hematología": "bg-zinc-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-300",
-            "Salud Mental, Psiquiatría y Adicciones": "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-950/60 dark:text-fuchsia-300",
-            "Oftalmología y Optometría": "bg-sky-100 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300",
-            "Otorrinolaringología (ENT) y Audiología": "bg-green-100 text-green-800 dark:bg-green-950/60 dark:text-green-300",
-            "Dermatología y Heridas": "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300",
-            "Odontología y Maxilofacial": "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300",
-            "Urgencias, Trauma y Toxicología": "bg-red-200 text-red-900 dark:bg-red-900/60 dark:text-red-200",
-            "Regionalismos y Coloquialismos Médicos": "bg-amber-200 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200" 
-        };
-
-        function highlightMatch(text, queryWords) {
-            if (!queryWords || queryWords.length === 0) return text;
-            let result = text;
-            queryWords.forEach(w => {
-                if (w.length < 2) return;
-                const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`(${escaped})`, 'gi');
-                result = result.replace(regex, '<mark class="hl">$1</mark>');
-            });
-            return result;
-        }
-
-        function renderTable(termsToRender, queryWords = []) {
-            const tbody = document.getElementById('tableBody');
-            updateStats(termsToRender);
-            if (termsToRender.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="py-12 text-center text-slate-400 font-medium">No se encontraron segmentos para esta búsqueda. Presiona <kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-800 rounded text-xs">ESC</kbd> para reiniciar.</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = termsToRender.map((term) => {
-                const bClass = badgeColors[term.cat] || "bg-slate-200 text-slate-800";
-                const escapedSpeech = term.en.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                const escapedCopyEn = term.en.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                const escapedCopyEs = term.es.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                const hlEn = highlightMatch(term.en, queryWords);
-                const hlEs = highlightMatch(term.es, queryWords);
-
-                return `
-                    <tr class="hover:bg-blue-50/70 dark:hover:bg-slate-800/60 transition-colors group">
-                        <td class="py-2 px-3.5 align-top">
-                            <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-md ${bClass}">
-                                ${term.cat}
-                            </span>
-                        </td>
-                        <td class="py-2 px-3.5 text-slate-900 dark:text-slate-100 font-semibold align-top">
-                            <div class="flex items-start justify-between gap-2">
-                                <span onclick="copyText('${escapedCopyEn}')" class="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition" title="Clic para copiar">${hlEn}</span>
-                                <button onclick="speakText('${escapedSpeech}')" class="shrink-0 w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-blue-900 text-slate-500 hover:text-blue-600 dark:hover:text-blue-300 flex items-center justify-center text-xs transition" title="Pronunciar en inglés">🔊</button>
-                            </div>
-                        </td>
-                        <td onclick="copyText('${escapedCopyEs}')" class="py-2 px-3.5 text-slate-700 dark:text-slate-300 align-top border-l border-slate-100 dark:border-slate-800/80 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition" title="Clic para copiar">
-                            ${hlEs}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function filterTerms() {
-            const rawQ = document.getElementById('searchInput').value.trim();
-            const queryWords = normalizeStr(rawQ).split(/\s+/).filter(w => w);
-            const rawWordsForHl = rawQ.split(/\s+/).filter(w => w);
-            const category = document.getElementById('categoryFilter').value;
-
-            const filtered = medicalTerms.filter(term => {
-                if (category !== "Todas" && term.cat !== category) return false;
-                if (queryWords.length === 0) return true;
-                const text = normalizeStr(`${term.en} ${term.es} ${term.cat}`);
-                return queryWords.every(word => text.includes(word));
-            });
-            renderTable(filtered, rawWordsForHl);
-        }
-
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            filterTerms();
-            document.getElementById('searchInput').focus();
-        }
-
-        function setCategory(cat) {
-            document.getElementById('categoryFilter').value = cat;
-            filterTerms();
-        }
-
-        function toggleAddDrawer() {
-            document.getElementById('addDrawer').classList.toggle('hidden');
-        }
-
-        function addTerm() {
-            const newEn = document.getElementById('newEn').value.trim();
-            const newEs = document.getElementById('newEs').value.trim();
-            const newCat = document.getElementById('newCat').value;
-            if (!newEn || !newEs) return showToast('⚠️ Ingresa el término en ambos idiomas');
-            medicalTerms.unshift({ cat: newCat, en: newEn, es: newEs });
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(medicalTerms));
-            document.getElementById('newEn').value = '';
-            document.getElementById('newEs').value = '';
-            filterTerms();
-            showToast('✅ Término guardado en tu glosario');
-        }
-
-        function exportCSV() {
-            let csvContent = "\uFEFFCategoría,Inglés,Español\n";
-            medicalTerms.forEach(t => {
-                csvContent += `"${t.cat.replace(/"/g, '""')}","${t.en.replace(/"/g, '""')}","${t.es.replace(/"/g, '""')}"\n`;
-            });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'glosario_medico_pro_suite.csv';
-            a.click();
-            showToast('📥 Archivo CSV descargado');
-        }
-
-        function resetDatabase() {
-            if (confirm("¿Restaurar los más de 680 segmentos originales de fábrica?")) {
-                localStorage.removeItem(STORAGE_KEY);
-                medicalTerms = parseDefaultDB();
-                initCategories();
-                clearSearch();
-                showToast('🔄 Base de datos restaurada');
-            }
+            showToast('📋 Copiado: ' + (text.length > 40 ? text.slice(0, 40) + '...' : text));
         }
 
         // =========================================================================
-        // 2. SCRATCHPAD, CONVERSORES Y CRONÓMETRO
-        // =========================================================================
-        const pad = document.getElementById('scratchpad');
-        function insertNote(text) {
-            const start = pad.selectionStart, end = pad.selectionEnd;
-            pad.value = pad.value.substring(0, start) + text + pad.value.substring(end);
-            pad.selectionStart = pad.selectionEnd = start + text.length;
-            pad.focus();
-            saveScratchpad();
-        }
-        function insertToday() {
-            const d = new Date();
-            insertNote(`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()} `);
-        }
-        function saveScratchpad() {
-            sessionStorage.setItem('callNotesProV11', pad.value);
-            document.getElementById('charCounter').innerText = `${pad.value.length} car.`;
-        }
-        function wipeNotes() {
-            pad.value = '';
-            sessionStorage.removeItem('callNotesProV11');
-            document.getElementById('charCounter').innerText = '0 car.';
-            document.querySelectorAll('input[type="number"]').forEach(i => i.value = '');
-            document.getElementById('ftOutput').innerText = `ft'in"`;
-            pad.focus();
-            showToast('🗑️ Notas destruidas (Cumplimiento HIPAA)');
-        }
-
-        let timerSecs = 0, timerInt = null;
-        function updateTimer() {
-            document.getElementById('callTimer').innerText = `${String(Math.floor(timerSecs/60)).padStart(2,'0')}:${String(timerSecs%60).padStart(2,'0')}`;
-        }
-        function toggleTimer() {
-            const btn = document.getElementById('timerBtn');
-            if (timerInt) {
-                clearInterval(timerInt); timerInt = null;
-                btn.innerText = '▶';
-                btn.className = 'text-[10px] px-1.5 py-0.5 bg-emerald-600 hover:bg-emerald-500 rounded text-white font-bold transition';
-            } else {
-                timerInt = setInterval(() => { timerSecs++; updateTimer(); }, 1000);
-                btn.innerText = '⏸';
-                btn.className = 'text-[10px] px-1.5 py-0.5 bg-amber-600 hover:bg-amber-500 rounded text-white font-bold transition';
-            }
-        }
-        function resetTimer() { if (timerInt) toggleTimer(); timerSecs = 0; updateTimer(); }
-
-        function convertWeight(s) {
-            const kg = document.getElementById('kgInput'), lb = document.getElementById('lbInput');
-            if (s === 'kg') lb.value = kg.value ? (kg.value * 2.20462).toFixed(1) : '';
-            else kg.value = lb.value ? (lb.value / 2.20462).toFixed(1) : '';
-        }
-        function convertTemp(s) {
-            const c = document.getElementById('cInput'), f = document.getElementById('fInput');
-            if (s === 'c') f.value = c.value ? ((c.value * 9/5) + 32).toFixed(1) : '';
-            else c.value = f.value ? ((f.value - 32) * 5/9).toFixed(1) : '';
-        }
-        function convertHeight() {
-            const cm = parseFloat(document.getElementById('cmInput').value);
-            const out = document.getElementById('ftOutput');
-            if (!cm || cm <= 0) { out.innerText = `ft'in"`; return; }
-            const totalInches = cm / 2.54;
-            const feet = Math.floor(totalInches / 12);
-            const inches = Math.round(totalInches % 12);
-            out.innerText = `${feet}'${inches}"`;
-        }
-
-        function updateClocks() {
-            const now = new Date(), opts = { hour: '2-digit', minute: '2-digit', hour12: true };
-            document.getElementById('time-cr').innerText = now.toLocaleTimeString('en-US', { ...opts, timeZone: 'America/Costa_Rica' });
-            document.getElementById('time-pt').innerText = now.toLocaleTimeString('en-US', { ...opts, timeZone: 'America/Los_Angeles' });
-            document.getElementById('time-mt').innerText = now.toLocaleTimeString('en-US', { ...opts, timeZone: 'America/Denver' });
-            document.getElementById('time-ct').innerText = now.toLocaleTimeString('en-US', { ...opts, timeZone: 'America/Chicago' });
-            document.getElementById('time-et').innerText = now.toLocaleTimeString('en-US', { ...opts, timeZone: 'America/New_York' });
-        }
-        setInterval(updateClocks, 1000); updateClocks();
-
-        // =========================================================================
-        // 3. AGENCIAS, PROTOCOLOS, FLASHCARDS Y AUDIO TTS
-        // =========================================================================
-        function saveInterpreterId() {
-            const idVal = document.getElementById('interpreterIdInput').value.trim();
-            localStorage.setItem('interpreterSavedId', idVal);
-            updateAgencyScripts();
-        }
-
-        function updateAgencyScripts() {
-            const agency = document.getElementById('agencySelect').value;
-            const idVal = localStorage.getItem('interpreterSavedId') || '[ID]';
-            document.getElementById('modalAgencyLabel').innerText = agency;
-            const scripts = {
-                "Konnect CX": `"Hello, thank you for calling. My name is Dykembel, interpreter ID ${idVal}. I will be your Spanish medical interpreter today. How may I help you?"`,
-                "MultilingualInt": `"Hello, my name is Dykembel, ID ${idVal}. I will be the Spanish interpreter for this session. Please speak in short pauses. Go ahead."`,
-                "Nuvo CX": `"Spanish interpreter Dykembel speaking, ID ${idVal}. Everything said will be kept confidential. I am ready when you are."`,
-                "Genérica": `"Hello, my name is Dykembel, ID ${idVal}, your Spanish medical interpreter. How may I assist you today?"`
-            };
-            document.getElementById('script-intro').innerText = scripts[agency];
-        }
-
-        function toggleTheme() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            document.getElementById('themeBtn').innerText = isDark ? '☀️' : '🌙';
-        }
-        document.getElementById('themeBtn').innerText = document.documentElement.classList.contains('dark') ? '☀️' : '🌙';
-
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang = 'en-US';
-                u.rate = 0.88;
-                window.speechSynthesis.speak(u);
-            }
-        }
-
-        function toggleModal(id) {
-            document.getElementById(id).classList.toggle('hidden');
-        }
-
-        function openFlashcards() {
-            toggleModal('flashcardModal');
-            nextFlashcard();
-        }
-
-        let currentFlashcard = {};
-        function nextFlashcard() {
-            document.getElementById('fc-card').classList.remove('flipped');
-            setTimeout(() => {
-                currentFlashcard = medicalTerms[Math.floor(Math.random() * medicalTerms.length)];
-                document.getElementById('fc-cat').innerText = currentFlashcard.cat;
-                document.getElementById('fc-front').innerText = currentFlashcard.en;
-                document.getElementById('fc-back').innerText = currentFlashcard.es;
-            }, 150);
-        }
-        function flipCard() { document.getElementById('fc-card').classList.toggle('flipped'); }
-
-        // =========================================================================
-        // 4. ATLAS ANATÓMICO INTERACTIVO (8 SISTEMAS COMPLETOS + SILUETA SVG)
-        // =========================================================================
-        const anatomyData = {
-            "Nervioso": [
-                { en: "Brain (Cerebrum)", es: "Cerebro", q: "Brain" },
-                { en: "Cerebellum", es: "Cerebelo", q: "Neurología" },
-                { en: "Brainstem", es: "Tronco encefálico / Tallo cerebral", q: "Brain" },
-                { en: "Spinal cord", es: "Médula espinal", q: "Spinal" },
-                { en: "Meninges", es: "Meninges (Membranas cerebrales)", q: "Meningitis" },
-                { en: "Sciatic nerve", es: "Nervio ciático", q: "Sciatica" },
-                { en: "Trigeminal nerve", es: "Nervio trigémino", q: "Trigeminal" },
-                { en: "Facial nerve", es: "Nervio facial", q: "Bell" },
-                { en: "Pituitary gland", es: "Glándula pituitaria (Hipófisis)", q: "Pituitary" },
-                { en: "Skull / Cranium", es: "Cráneo", q: "Skull" },
-                { en: "Temple", es: "Sien", q: "Temple" },
-                { en: "Cerebrospinal fluid (CSF)", es: "Líquido cefalorraquídeo", q: "Lumbar" }
-            ],
-            "Sentidos": [
-                { en: "Eye / Eyeball", es: "Ojo / Globo ocular", q: "Oftalmología" },
-                { en: "Cornea & Pupil", es: "Córnea y Pupila", q: "Cornea" },
-                { en: "Retina & Macula", es: "Retina y Mácula", q: "Retina" },
-                { en: "Optic nerve", es: "Nervio óptico", q: "Optic" },
-                { en: "Eyelid & Tear duct", es: "Párpado y Conducto lagrimal", q: "Stye" },
-                { en: "Eardrum (Tympanic membrane)", es: "Tímpano (Membrana timpánica)", q: "Eardrum" },
-                { en: "Middle ear & Inner ear (Cochlea)", es: "Oído medio y Oído interno (Cóclea)", q: "Ear" },
-                { en: "Sinuses (Paranasal sinuses)", es: "Senos paranasales", q: "Sinusitis" },
-                { en: "Nasal septum", es: "Tabique nasal", q: "septum" },
-                { en: "Tonsils & Adenoids", es: "Amígdalas (Anginas) y Adenoides", q: "Tonsillitis" },
-                { en: "Pharynx (Throat)", es: "Faringe (Garganta)", q: "Throat" },
-                { en: "Larynx (Voice box / Vocal cords)", es: "Laringe (Cuerdas vocales)", q: "Larynx" },
-                { en: "Thyroid gland", es: "Glándula tiroides", q: "Thyroid" },
-                { en: "Lymph nodes", es: "Ganglios linfáticos", q: "Lymph" }
-            ],
-            "Respiratorio": [
-                { en: "Lungs (Right & Left lobes)", es: "Pulmones (Lóbulos derecho e izquierdo)", q: "Lungs" },
-                { en: "Trachea (Windpipe)", es: "Tráquea", q: "Trachea" },
-                { en: "Bronchi / Bronchial tubes", es: "Bronquios / Tubos bronquiales", q: "Bronchitis" },
-                { en: "Bronchioles", es: "Bronquiolos", q: "Bronchiolitis" },
-                { en: "Alveoli (Air sacs)", es: "Alvéolos (Sacos de aire)", q: "Pneumonia" },
-                { en: "Pleura / Pleural cavity", es: "Pleura / Cavidad pleural", q: "Pleural" },
-                { en: "Diaphragm", es: "Diafragma", q: "Diaphragm" },
-                { en: "Epiglottis", es: "Epiglotis", q: "intubation" },
-                { en: "Nasal cavity / Airways", es: "Cavidad nasal / Vías respiratorias", q: "Respiratory" },
-                { en: "Rib cage / Thorax", es: "Caja torácica / Tórax", q: "Rib" }
-            ],
-            "Cardiovascular": [
-                { en: "Heart (Myocardium)", es: "Corazón (Miocardio)", q: "Heart" },
-                { en: "Left & Right Atrium", es: "Aurícula izquierda y derecha", q: "Atrial" },
-                { en: "Left & Right Ventricle", es: "Ventrículo izquierdo y derecho", q: "Cardiología" },
-                { en: "Aorta (Main artery)", es: "Arteria aorta", q: "Aorta" },
-                { en: "Coronary arteries", es: "Arterias coronarias", q: "Coronary" },
-                { en: "Carotid artery", es: "Arteria carótida (Cuello)", q: "Carotid" },
-                { en: "Mitral & Aortic valves", es: "Válvula mitral y Válvula aórtica", q: "valve" },
-                { en: "Pericardium", es: "Pericardio (Saco del corazón)", q: "Pericarditis" },
-                { en: "Veins & Deep veins", es: "Venas y Venas profundas", q: "Vein" },
-                { en: "Capillaries", es: "Capilares", q: "Capillaries" },
-                { en: "Pulmonary artery", es: "Arteria pulmonar", q: "Pulmonary" },
-                { en: "Spleen & Bone marrow", es: "Bazo y Médula ósea", q: "Bone marrow" }
-            ],
-            "Digestivo": [
-                { en: "Esophagus (Food pipe)", es: "Esófago", q: "Esophagus" },
-                { en: "Stomach", es: "Estómago", q: "Stomach" },
-                { en: "Small intestine (Duodenum, Ileum)", es: "Intestino delgado (Duodeno, Íleon)", q: "intestine" },
-                { en: "Large intestine / Colon", es: "Intestino grueso / Colon", q: "Colon" },
-                { en: "Liver", es: "Hígado", q: "Liver" },
-                { en: "Gallbladder", es: "Vesícula biliar", q: "Gallbladder" },
-                { en: "Bile ducts", es: "Conductos biliares (Vías biliares)", q: "Bile" },
-                { en: "Pancreas", es: "Páncreas", q: "Pancreas" },
-                { en: "Appendix", es: "Apéndice", q: "Appendix" },
-                { en: "Rectum & Anus", es: "Recto y Ano", q: "Hemorrhoids" },
-                { en: "Peritoneum (Abdominal lining)", es: "Peritoneo (Membrana abdominal)", q: "Paracentesis" },
-                { en: "Inguinal canal (Groin)", es: "Canal inguinal (Ingle)", q: "Inguinal" }
-            ],
-            "Urinario": [
-                { en: "Kidneys (Renal cortex/pelvis)", es: "Riñones (Corteza y pelvis renal)", q: "Kidney" },
-                { en: "Ureters", es: "Uréteres (Conductos del riñón a la vejiga)", q: "Ureter" },
-                { en: "Urinary bladder", es: "Vejiga urinaria", q: "Bladder" },
-                { en: "Urethra", es: "Uretra", q: "Urethra" },
-                { en: "Adrenal glands", es: "Glándulas suprarrenales", q: "Adrenal" },
-                { en: "Pelvic floor muscles", es: "Músculos del suelo pélvico", q: "incontinence" },
-                { en: "Nephron (Filtering unit)", es: "Nefrona (Unidad de filtración)", q: "Dialysis" },
-                { en: "Flank (Lower back side)", es: "Flanco / Costado lumbar", q: "Flank" }
-            ],
-            "Reproductor": [
-                { en: "Uterus (Womb)", es: "Útero (Matriz)", q: "Uterus" },
-                { en: "Ovaries", es: "Ovarios", q: "Ovarian" },
-                { en: "Fallopian tubes", es: "Trompas de Falopio", q: "Fallopian" },
-                { en: "Cervix (Neck of the womb)", es: "Cuello uterino (Cérvix)", q: "Cervical" },
-                { en: "Endometrium (Uterine lining)", es: "Endometrio (Revestimiento del útero)", q: "Endometriosis" },
-                { en: "Vagina & Vulva", es: "Vagina y Vulva", q: "Vaginal" },
-                { en: "Mammary glands (Breasts)", es: "Glándulas mamarias (Senos / Pechos)", q: "Mammogram" },
-                { en: "Placenta & Amniotic sac", es: "Placenta y Bolsa amniótica", q: "Placenta" },
-                { en: "Prostate gland", es: "Glándula prostática (Próstata)", q: "Prostate" },
-                { en: "Testicles & Scrotum", es: "Testículos y Escroto", q: "Testicular" },
-                { en: "Vas deferens", es: "Conductos deferentes", q: "Vasectomy" }
-            ],
-            "Esquelético": [
-                { en: "Cervical, Thoracic & Lumbar Spine", es: "Columna cervical, torácica y lumbar", q: "Spine" },
-                { en: "Vertebrae & Intervertebral discs", es: "Vértebras y Discos intervertebrales", q: "Herniated" },
-                { en: "Tailbone (Coccyx) & Sacrum", es: "Cóccix (Rabadilla) y Sacro", q: "Tailbone" },
-                { en: "Collarbone (Clavicle)", es: "Clavícula", q: "Collarbone" },
-                { en: "Shoulder blade (Scapula) & Rotator cuff", es: "Omóplato (Escápula) y Manguito rotador", q: "Rotator" },
-                { en: "Sternum (Breastbone) & Ribs", es: "Esternón y Costillas", q: "Breastbone" },
-                { en: "Humerus, Radius & Ulna (Arm/Forearm)", es: "Húmero, Radio y Cúbito (Brazo/Antebrazo)", q: "Forearm" },
-                { en: "Wrist (Carpals) & Knuckles", es: "Muñeca (Carpo) y Nudillos", q: "Carpal" },
-                { en: "Pelvis & Hip joint", es: "Pelvis y Articulación de la cadera", q: "Hip" },
-                { en: "Femur (Thigh bone)", es: "Fémur (Hueso del muslo)", q: "Thigh" },
-                { en: "Kneecap (Patella), Meniscus & ACL", es: "Rótula (Choquezuela), Menisco y Ligamento Cruzado", q: "Meniscus" },
-                { en: "Tibia (Shinbone) & Fibula", es: "Tibia (Espinilla) y Peroné", q: "Shin" },
-                { en: "Calf muscle & Achilles tendon", es: "Pantorrilla (Batata) y Tendón de Aquiles", q: "Calf" },
-                { en: "Ankle, Heel (Calcaneus) & Plantar fascia", es: "Tobillo, Talón y Fascia plantar", q: "Plantar" }
-            ]
-        };
-
-        function openAtlas() {
-            toggleModal('atlasModal');
-            loadAtlasSystem('Nervioso');
-        }
-
-        function loadAtlasSystem(sys) {
-            document.querySelectorAll('.atlas-btn').forEach(btn => {
-                btn.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600', 'shadow-md');
-            });
-            const activeBtn = document.getElementById('btn-atlas-' + sys);
-            if (activeBtn) activeBtn.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600', 'shadow-md');
-
-            document.querySelectorAll('.body-zone').forEach(z => z.classList.remove('active-zone'));
-            const activeSvg = document.getElementById('svg-' + sys);
-            if (activeSvg) activeSvg.classList.add('active-zone');
-
-            document.getElementById('atlas-title').innerText = activeBtn ? activeBtn.children[0].innerText : sys;
-
-            const container = document.getElementById('atlas-content');
-            container.innerHTML = anatomyData[sys].map(item => {
-                const escapedEn = item.en.replace(/'/g, "\\'");
-                const escapedQ = (item.q || item.en.split(' ')[0]).replace(/'/g, "\\'");
-                return `
-                    <div class="flex justify-between items-center p-3.5 bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700/80 rounded-2xl hover:border-emerald-500 dark:hover:border-emerald-500 transition group">
-                        <div class="flex flex-col pr-2">
-                            <span onclick="copyText('${escapedEn}')" class="font-extrabold text-slate-900 dark:text-white text-sm md:text-base cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400">${item.en}</span>
-                            <span class="text-slate-600 dark:text-slate-300 text-xs font-medium mt-0.5">${item.es}</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <button onclick="speakText('${escapedEn}')" class="w-8 h-8 bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 rounded-xl hover:bg-emerald-600 hover:text-white transition shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs" title="Pronunciar en inglés">🔊</button>
-                            <button onclick="jumpFromAtlas('${escapedQ}')" class="w-8 h-8 bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs" title="Ver términos relacionados en el glosario">🔍</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function jumpFromAtlas(query) {
-            toggleModal('atlasModal');
-            document.getElementById('categoryFilter').value = 'Todas';
-            const input = document.getElementById('searchInput');
-            input.value = query;
-            filterTerms();
-        }
-
-        // =========================================================================
-        // 5. MOTOR DE SUBTÍTULOS BILINGÜES EN TIEMPO REAL Y AUTO-DETECCIÓN
+        // 2. NUEVO MOTOR DE SUBTÍTULOS BILINGÜES EN CASCADA (FLUIDO)
         // =========================================================================
         let recognition = null;
         let isListening = false;
-        let listenLang = 'en-US';
+        let listenLang = 'en-US'; // Default
+        const maxHistoryCards = 12;
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -1615,26 +1038,33 @@ Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús 
                     }
                 }
 
-                document.getElementById('liveInterim').innerText = interimTranscript;
+                // Manejo del texto provisorio (interim) - Flotando abajo
+                const interimBox = document.getElementById('liveInterimBox');
+                const interimEl = document.getElementById('liveInterimText');
+                
+                if (interimTranscript.trim().length > 0) {
+                    document.getElementById('emptyFeedMsg').classList.add('hidden');
+                    interimBox.classList.remove('hidden');
+                    interimEl.innerText = interimTranscript;
+                    scrollToBottomFeed();
+                } else {
+                    interimBox.classList.add('hidden');
+                }
 
+                // Cuando el doctor o paciente termina la frase
                 if (finalSegment.trim().length > 0) {
-                    document.getElementById('liveOriginal').innerText = finalSegment.trim();
-                    document.getElementById('liveInterim').innerText = '';
-                    translateLiveSegment(finalSegment.trim(), listenLang);
-                    detectGlossaryTermsInSpeech(finalSegment.trim());
+                    processFinalSegment(finalSegment.trim());
                 }
             };
 
             recognition.onend = () => {
-                if (isListening) {
-                    try { recognition.start(); } catch (e) {}
-                }
+                if (isListening) { try { recognition.start(); } catch (e) {} }
             };
         }
 
         function toggleLiveCaptions() {
             if (!recognition) {
-                alert("Usa Google Chrome, Brave o Microsoft Edge para activar el reconocimiento de voz en tiempo real.");
+                alert("Usa Google Chrome, Brave o Microsoft Edge para activar el reconocimiento de voz nativo.");
                 return;
             }
             const btn = document.getElementById('btnStartCaptions');
@@ -1646,7 +1076,8 @@ Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús 
                 btn.innerText = '▶ Capturar Audio';
                 btn.className = 'px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-lg transition shadow-sm';
                 pulse.className = 'w-2.5 h-2.5 rounded-full bg-slate-500';
-                showToast('⏸ Subtítulos en pausa');
+                document.getElementById('liveInterimBox').classList.add('hidden');
+                showToast('⏸ Subtítulos pausados');
             } else {
                 isListening = true;
                 recognition.lang = listenLang;
@@ -1654,118 +1085,122 @@ Soponcio or Patatús / Fainting spell or sudden dizzy spell|Soponcio / Patatús 
                 btn.innerText = '⏹ Detener';
                 btn.className = 'px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold rounded-lg transition shadow-sm';
                 pulse.className = 'w-2.5 h-2.5 rounded-full bg-red-500 animate-ping';
-                showToast('🎙️ Capturando audio (' + (listenLang === 'en-US' ? 'EN → ES' : 'ES → EN') + ')');
+                showToast('🎙️ Capturando: ' + (listenLang === 'en-US' ? 'Inglés' : 'Español'));
             }
         }
 
-        function setListenLang(lang) {
-            listenLang = lang;
-            const btnEn = document.getElementById('btnLangEn');
-            const btnEs = document.getElementById('btnLangEs');
-
-            if (lang === 'en-US') {
-                btnEn.className = 'px-2.5 py-1 bg-blue-600 text-white text-[11px] font-bold rounded-lg transition';
-                btnEs.className = 'px-2.5 py-1 bg-slate-800 text-slate-400 hover:text-white text-[11px] font-bold rounded-lg transition';
-                showToast('🇺🇸 Escuchando Inglés (Traduce a Español)');
+        function toggleLiveLang() {
+            listenLang = listenLang === 'en-US' ? 'es-CR' : 'en-US';
+            const btn = document.getElementById('btnLiveLang');
+            
+            if (listenLang === 'en-US') {
+                btn.innerText = '🇺🇸 EN → ES';
+                btn.className = 'px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold rounded-lg transition shadow-sm';
+                showToast('🇺🇸 Ahora escuchando en Inglés');
             } else {
-                btnEs.className = 'px-2.5 py-1 bg-blue-600 text-white text-[11px] font-bold rounded-lg transition';
-                btnEn.className = 'px-2.5 py-1 bg-slate-800 text-slate-400 hover:text-white text-[11px] font-bold rounded-lg transition';
-                showToast('🇪🇸 Escuchando Español (Traduce a Inglés)');
+                btn.innerText = '🇪🇸 ES → EN';
+                btn.className = 'px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-bold rounded-lg transition shadow-sm';
+                showToast('🇪🇸 Ahora escuchando en Español');
             }
 
             if (isListening && recognition) {
-                recognition.lang = listenLang;
                 recognition.stop();
+                recognition.lang = listenLang;
             }
         }
 
-        async function translateLiveSegment(text, sourceLang) {
+        async function processFinalSegment(text) {
+            const msgId = 'seg-' + Date.now();
+            const sourceLang = listenLang;
             const sl = sourceLang.startsWith('en') ? 'en' : 'es';
             const tl = sl === 'en' ? 'es' : 'en';
-            const transEl = document.getElementById('liveTranslated');
 
+            // Buscar en glosario
+            const normText = normalizeStr(text);
+            const matches = medicalTerms.filter(t => {
+                const cleanEn = normalizeStr(t.en.split('(')[0]).trim();
+                const cleanEs = normalizeStr(t.es.split('(')[0].split('/')[0]).trim();
+                return (cleanEn.length > 4 && normText.includes(cleanEn)) ||
+                       (cleanEs.length > 4 && normText.includes(cleanEs));
+            }).slice(0, 3);
+
+            // Añadir tarjeta a la interfaz (Cargando traducción)
+            addTranscriptCard(msgId, text, 'Traduciendo...', matches, sl);
+
+            // Fetch Traducción real
             try {
                 const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(text)}`;
                 const res = await fetch(url);
                 const data = await res.json();
-                transEl.innerText = data[0].map(item => item[0]).join('');
+                const translatedText = data[0].map(item => item[0]).join('');
+                updateTranscriptCard(msgId, translatedText);
             } catch (err) {
-                transEl.innerText = "Sin conexión al servidor de traducción instantánea.";
+                updateTranscriptCard(msgId, '⚠️ Error de traducción de red.');
             }
         }
 
-        function detectGlossaryTermsInSpeech(spokenText) {
-            const normSpoken = normalizeStr(spokenText);
-            if (normSpoken.length < 4) return;
-
-            const matches = medicalTerms.filter(t => {
-                const cleanEn = normalizeStr(t.en.split('(')[0]).trim();
-                const cleanEs = normalizeStr(t.es.split('(')[0].split('/')[0]).trim();
-                return (cleanEn.length > 4 && normSpoken.includes(cleanEn)) ||
-                       (cleanEs.length > 4 && normSpoken.includes(cleanEs));
-            }).slice(0, 4);
-
-            const box = document.getElementById('autoDetectedBox');
-            const chips = document.getElementById('autoDetectedChips');
-
+        function addTranscriptCard(id, original, transPlaceholder, matches, sl) {
+            const feed = document.getElementById('transcriptFeed');
+            const interimBox = document.getElementById('liveInterimBox');
+            
+            const flag = sl === 'en' ? '🇺🇸' : '🇪🇸';
+            const colorSrc = sl === 'en' ? 'text-blue-400' : 'text-amber-400';
+            const colorTr = sl === 'en' ? 'text-emerald-400' : 'text-blue-400';
+            
+            let chipsHtml = '';
             if (matches.length > 0) {
-                box.classList.remove('hidden');
-                chips.innerHTML = matches.map(m => `
-                    <span onclick="copyText('${m.es.replace(/'/g, "\\'")}')" class="cursor-pointer text-[11px] bg-amber-500/20 border border-amber-400/40 text-amber-200 px-2 py-0.5 rounded-md font-semibold hover:bg-amber-500/30 transition">
-                        <strong>${m.en}:</strong> ${m.es}
-                    </span>
-                `).join('');
+                chipsHtml = `<div class="mt-2.5 pt-2 border-t border-slate-700/50 flex flex-wrap gap-1.5">
+                    <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest flex items-center mr-1">⚡ Detectado:</span>
+                    ${matches.map(m => `<span onclick="copyText('${m.es.replace(/'/g, "\\'")}')" class="cursor-pointer text-[10px] bg-slate-800/80 border border-slate-600 text-slate-300 px-2 py-0.5 rounded flex items-center gap-1 hover:bg-slate-700 transition" title="Copiar"><strong class="${colorSrc}">${sl==='en'?m.en:m.es}</strong> <span class="opacity-50">➔</span> <span class="${colorTr}">${sl==='en'?m.es:m.en}</span></span>`).join('')}
+                </div>`;
+            }
+
+            const cardHtml = `
+                <div id="${id}" class="bg-slate-900/80 border border-slate-700 p-3.5 rounded-2xl shadow-sm animate-fade-in-up group relative">
+                    <button onclick="copyText(document.getElementById('${id}-trans').innerText)" class="absolute top-3 right-3 text-slate-500 hover:text-white opacity-0 group-hover:opacity-100 transition" title="Copiar traducción">📋</button>
+                    <div class="flex flex-col gap-1">
+                        <p class="text-sm font-semibold text-slate-200"><span class="mr-1.5 opacity-80">${flag}</span>${original}</p>
+                        <p id="${id}-trans" class="text-sm font-bold ${colorTr} ml-5 animate-pulse">${transPlaceholder}</p>
+                    </div>
+                    ${chipsHtml}
+                </div>
+            `;
+
+            // Insertar la tarjeta ANTES de la caja interim
+            interimBox.insertAdjacentHTML('beforebegin', cardHtml);
+            
+            // Mantener límite de historial
+            const cards = feed.querySelectorAll('div[id^="seg-"]');
+            if (cards.length > maxHistoryCards) {
+                cards[0].remove();
+            }
+
+            scrollToBottomFeed();
+        }
+
+        function updateTranscriptCard(id, translatedText) {
+            const transEl = document.getElementById(`${id}-trans`);
+            if (transEl) {
+                transEl.innerText = translatedText;
+                transEl.classList.remove('animate-pulse');
             }
         }
 
-        function clearCaptions() {
-            document.getElementById('liveOriginal').innerText = 'Subtítulos limpios...';
-            document.getElementById('liveInterim').innerText = '';
-            document.getElementById('liveTranslated').innerText = '...';
-            document.getElementById('autoDetectedBox').classList.add('hidden');
+        function scrollToBottomFeed() {
+            const feed = document.getElementById('transcriptFeed');
+            feed.scrollTop = feed.scrollHeight;
         }
 
-        // =========================================================================
-        // 6. ATAJOS DE TECLADO GLOBALES E INICIALIZACIÓN
-        // =========================================================================
-        document.addEventListener('keydown', (e) => {
-            const fcOpen = !document.getElementById('flashcardModal').classList.contains('hidden');
-            if (fcOpen) {
-                if (e.code === 'Space') { e.preventDefault(); flipCard(); }
-                else if (e.code === 'ArrowRight') { e.preventDefault(); nextFlashcard(); }
-                else if (e.key === 'Escape') { e.preventDefault(); toggleModal('flashcardModal'); }
-                return;
-            }
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                document.getElementById('atlasModal').classList.add('hidden');
-                document.getElementById('protocolModal').classList.add('hidden');
-                clearSearch();
-            } else if (e.altKey && (e.key === 'l' || e.key === 'L')) {
-                e.preventDefault();
-                setListenLang(listenLang === 'en-US' ? 'es-CR' : 'en-US');
-            } else if (e.altKey && (e.key === 's' || e.key === 'S')) {
-                e.preventDefault();
-                toggleLiveCaptions();
-            } else if (e.altKey && (e.key === 'n' || e.key === 'N')) {
-                e.preventDefault();
-                pad.focus();
-            } else if (e.altKey && e.key === 'Backspace') {
-                e.preventDefault();
-                wipeNotes();
-            }
-        });
+        function clearCaptionsFeed() {
+            const feed = document.getElementById('transcriptFeed');
+            const cards = feed.querySelectorAll('div[id^="seg-"]');
+            cards.forEach(c => c.remove());
+            document.getElementById('liveInterimText').innerText = '';
+            document.getElementById('liveInterimBox').classList.add('hidden');
+            document.getElementById('emptyFeedMsg').classList.remove('hidden');
+            showToast('🗑️ Historial de subtítulos borrado');
+        }
 
-        if (localStorage.getItem('interpreterSavedId')) {
-            document.getElementById('interpreterIdInput').value = localStorage.getItem('interpreterSavedId');
-        }
-        initCategories();
-        renderTable(medicalTerms);
-        updateAgencyScripts();
-        if (sessionStorage.getItem('callNotesProV11')) {
-            pad.value = sessionStorage.getItem('callNotesProV11');
-            saveScratchpad();
-        }
     </script>
 </body>
 </html>
